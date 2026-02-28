@@ -3,13 +3,13 @@ const fs = require("fs");
 const path = require("path");
 
 // === CORRIGÉ : le fichier source est dans tile-generator/
-const inputImagePath = path.join(__dirname, "map.png");
+const inputImagePath = path.join(__dirname, "map.jpg");
 
 // === Le dossier de sortie reste dans assets/tiles à la racine
 const outputFolder = path.join(__dirname, "..", "assets", "tiles");
 
-const tileSize = 1024;
-const tileFormat = "png";
+const tileSize = 512;
+const tileFormat = "webp";
 
 async function generateTiles() {
   if (!fs.existsSync(outputFolder)) {
@@ -36,6 +36,7 @@ async function generateTiles() {
       try {
         await sharp(inputImagePath)
           .extract({ left, top, width: w, height: h })
+          .webp({ quality: 85 })
           .toFile(tilePath);
         console.log(`✅ Tuile : ${tilePath}`);
       } catch (err) {

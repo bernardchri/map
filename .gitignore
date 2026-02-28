@@ -4,6 +4,7 @@ dist/
 .DS_Store
 **/.DS_Store
 tile-generator/map.png
+tile-generator/map.jpg
 assets/tiles__photoshop/
 
 .vscode/

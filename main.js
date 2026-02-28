@@ -1,6 +1,6 @@
-const TILE_SIZE = 1024;
-const MAP_WIDTH_TILES = 8;
-const MAP_HEIGHT_TILES = 6;
+const TILE_SIZE = 512;
+const MAP_WIDTH_TILES = 14;
+const MAP_HEIGHT_TILES = 10;
 
 const MAX_SCALE = 2;
 
@@ -84,7 +84,7 @@ function loadVisibleTiles() {
       if (tileSprites[key]) continue;
       if (row < 0 || col < 0 || row >= MAP_HEIGHT_TILES || col >= MAP_WIDTH_TILES) continue;
 
-      const tilePath = `assets/tiles/${row}_${col}.png`;
+      const tilePath = `assets/tiles/${row}_${col}.webp`;
       const sprite = PIXI.Sprite.from(tilePath);
       sprite.x = col * TILE_SIZE;
       sprite.y = row * TILE_SIZE;
