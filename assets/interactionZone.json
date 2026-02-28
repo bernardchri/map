@@ -1,0 +1,32 @@
+[
+  {
+    "x": 3430,
+    "y": 4269,
+    "width": 200,
+    "height": 200,
+    "color": "#00ff00",
+    "image": "zone_sprite",
+    "imageRange": [0, 99],
+    "clickable": true,
+    "autoplay": true,
+    "playOnHover": false,
+    "loop": true,
+    "repeat": 0,
+    "fps": 30
+  },
+  {
+    "x": 1000,
+    "y": 2000,
+    "width": 150,
+    "height": 100,
+    "color": "#ff0000",
+    "image": "autre_sprite",
+    "imageRange": [0, 0],
+    "clickable": false,
+    "autoplay": false,
+    "playOnHover": false,
+    "loop": false,
+    "repeat": 0,
+    "fps": 30
+  }
+]

@@ -1,0 +1,7 @@
+*/node_modules/
+node_modules/
+dist/
+.DS_Store
+**/.DS_Store
+tile-generator/map.png
+assets/tiles__photoshop/
