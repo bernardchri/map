@@ -51,7 +51,9 @@ app.stage
 
 **Minimap (`main.js`):** HTML5 Canvas element (`#minimap`) drawing `assets/map-mini.webp` with a live viewport rectangle. Click or drag on the minimap to navigate.
 
-**Interactive zones:** Loaded from `assets/interactionZone.json`. Each zone renders a semi-transparent colored rectangle and optionally a `PIXI.AnimatedSprite`.
+**Interactive zones:** Loaded from `assets/interactionZone.json`. Each zone renders a semi-transparent colored rectangle and optionally a `PIXI.AnimatedSprite`. Frame images are WebP, named `assets/{image}/{image}_{n}.webp`.
+
+**Adding an animation:** export PNG frames into `assets/{name}/`, run `node tile-generator/frames-to-webp.js ../assets/{name}` to batch-convert to WebP (deletes PNGs), then add a zone entry in `interactionZone.json`.
 
 ## Interactive Zone JSON Schema
 

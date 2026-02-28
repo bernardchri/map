@@ -40,3 +40,15 @@ node minimap-generator.js
 ```
 
 Génère `assets/map-mini.webp` à 320px de large depuis `tile-generator/map.jpg`.
+
+## Ajouter une animation
+
+1. Exporte tes frames en PNG dans `assets/nom_animation/` (nommées `nom_animation_0.png`, `nom_animation_1.png`…)
+2. Convertis en WebP :
+
+```bash
+cd tile-generator
+node frames-to-webp.js ../assets/nom_animation
+```
+
+3. Ajoute une entrée dans `assets/interactionZone.json` avec `"image": "nom_animation"`
