@@ -282,7 +282,7 @@ fetch('assets/interactionZone.json')
     zones.forEach(zone => {
       if (zone.image && Array.isArray(zone.imageRange)) {
         for (let i = zone.imageRange[0]; i <= zone.imageRange[1]; i++) {
-          allFrames.push(`assets/${zone.image}/${zone.image}_${i}.png`);
+          allFrames.push(`assets/${zone.image}/${zone.image}_${i}.webp`);
         }
       }
     });
@@ -305,7 +305,7 @@ fetch('assets/interactionZone.json')
       if (zone.image && Array.isArray(zone.imageRange)) {
         const frames = [];
         for (let i = zone.imageRange[0]; i <= zone.imageRange[1]; i++) {
-          frames.push(PIXI.Texture.from(`assets/${zone.image}/${zone.image}_${i}.png`));
+          frames.push(PIXI.Texture.from(`assets/${zone.image}/${zone.image}_${i}.webp`));
         }
         animatedSprite = new PIXI.AnimatedSprite(frames);
         animatedSprite.width = zone.width;
