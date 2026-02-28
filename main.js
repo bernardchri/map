@@ -2,8 +2,15 @@ const TILE_SIZE = 1024;
 const MAP_WIDTH_TILES = 8;
 const MAP_HEIGHT_TILES = 6;
 
-const MIN_SCALE = 0.1;
 const MAX_SCALE = 2;
+
+// Zoom minimum dynamique : la carte couvre toujours tout l'écran
+function getMinScale() {
+  return Math.max(
+    app.screen.width  / (MAP_WIDTH_TILES  * TILE_SIZE),
+    app.screen.height / (MAP_HEIGHT_TILES * TILE_SIZE)
+  );
+}
 
 const app = new PIXI.Application({
   width: window.innerWidth,
@@ -126,7 +133,7 @@ app.view.addEventListener('wheel', (e) => {
   const mapY = (mouseY - targetY) / world.scale.y;
 
   const zoomFactor = 1 - e.deltaY * 0.0015;
-  const newScale = clamp(world.scale.x * zoomFactor, MIN_SCALE, MAX_SCALE);
+  const newScale = clamp(world.scale.x * zoomFactor, getMinScale(), MAX_SCALE);
 
   world.scale.set(newScale);
 
@@ -142,7 +149,7 @@ app.view.addEventListener('wheel', (e) => {
 
 // --- Zoom boutons centré sur le milieu de l'écran ---
 function setScaleAndClamp(newScale) {
-  const clampedScale = clamp(newScale, MIN_SCALE, MAX_SCALE);
+  const clampedScale = clamp(newScale, getMinScale(), MAX_SCALE);
 
   const centerX = app.screen.width / 2;
   const centerY = app.screen.height / 2;
@@ -170,31 +177,16 @@ document.getElementById('zoom-out').addEventListener('click', () => {
 
 // --- Centrage et zoom initial ---
 function centerAndFitToScreen() {
-  const scaleX = app.renderer.width / (MAP_WIDTH_TILES * TILE_SIZE);
-  const scaleY = app.renderer.height / (MAP_HEIGHT_TILES * TILE_SIZE);
-  const scale = Math.min(scaleX, scaleY);
-
+  const scale = getMinScale();
   world.scale.set(scale);
 
-  const mapWidthScaled = MAP_WIDTH_TILES * TILE_SIZE * scale;
-  const mapHeightScaled = MAP_HEIGHT_TILES * TILE_SIZE * scale;
+  const mapW = MAP_WIDTH_TILES  * TILE_SIZE * scale;
+  const mapH = MAP_HEIGHT_TILES * TILE_SIZE * scale;
 
-  world.x = (app.renderer.width - mapWidthScaled) / 2;
-  world.y = (app.renderer.height - mapHeightScaled) / 2;
+  world.x = (app.renderer.width  - mapW) / 2;
+  world.y = (app.renderer.height - mapH) / 2;
   targetX = world.x;
   targetY = world.y;
-
-  // Définit l'ancre au centre de la carte
-  anchor.x = (MAP_WIDTH_TILES * TILE_SIZE) / 2;
-  anchor.y = (MAP_HEIGHT_TILES * TILE_SIZE) / 2;
-
-  // Affiche le centre de la carte en coordonnées écran
-  const centerMap = { x: anchor.x, y: anchor.y };
-  const centerScreen = {
-    x: world.x + centerMap.x * world.scale.x,
-    y: world.y + centerMap.y * world.scale.y
-  };
-  console.log(`Centre de la carte (écran): (${centerScreen.x.toFixed(2)}, ${centerScreen.y.toFixed(2)})`);
 }
 
 centerAndFitToScreen();
