@@ -27,11 +27,11 @@
       pointer-events: none; /* éviter d'interférer avec la carte */
     }
     #minimap {
-      width: 150px;
-      height: 100px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid #aaa;
+      display: block;
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 3px;
       pointer-events: auto;
+      cursor: crosshair;
     }
     #zoom-controls {
       position: absolute;
@@ -62,7 +62,7 @@
   <div id="canvas-container"></div>
 
   <div id="map-ui">
-    <div id="minimap"></div>
+    <canvas id="minimap"></canvas>
   </div>
 
   <div id="zoom-controls">

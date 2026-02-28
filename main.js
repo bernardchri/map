@@ -197,7 +197,81 @@ window.addEventListener('resize', () => {
 });
 
 
-// ... tout le code avant inchangé ...
+// --- Minimap ---
+const minimapCanvas = document.getElementById('minimap');
+const minimapCtx = minimapCanvas.getContext('2d');
+
+const MINIMAP_W = 160;
+const MINIMAP_H = Math.round(MINIMAP_W / (MAP_WIDTH_TILES / MAP_HEIGHT_TILES));
+minimapCanvas.width  = MINIMAP_W;
+minimapCanvas.height = MINIMAP_H;
+
+const minimapImage = new Image();
+minimapImage.src = 'assets/map-mini.webp';
+
+function drawMinimap() {
+  minimapCtx.clearRect(0, 0, MINIMAP_W, MINIMAP_H);
+
+  if (minimapImage.complete && minimapImage.naturalWidth > 0) {
+    minimapCtx.drawImage(minimapImage, 0, 0, MINIMAP_W, MINIMAP_H);
+  } else {
+    minimapCtx.fillStyle = '#333';
+    minimapCtx.fillRect(0, 0, MINIMAP_W, MINIMAP_H);
+  }
+
+  const mapTotalW = MAP_WIDTH_TILES  * TILE_SIZE;
+  const mapTotalH = MAP_HEIGHT_TILES * TILE_SIZE;
+  const scaleX = MINIMAP_W / mapTotalW;
+  const scaleY = MINIMAP_H / mapTotalH;
+
+  const vLeft   = clamp(-world.x / world.scale.x, 0, mapTotalW);
+  const vTop    = clamp(-world.y / world.scale.y, 0, mapTotalH);
+  const vRight  = clamp((-world.x + app.screen.width)  / world.scale.x, 0, mapTotalW);
+  const vBottom = clamp((-world.y + app.screen.height) / world.scale.y, 0, mapTotalH);
+
+  const rx = vLeft  * scaleX;
+  const ry = vTop   * scaleY;
+  const rw = (vRight  - vLeft)   * scaleX;
+  const rh = (vBottom - vTop)    * scaleY;
+
+  minimapCtx.fillStyle   = 'rgba(255,255,255,0.15)';
+  minimapCtx.strokeStyle = 'rgba(255,255,255,0.9)';
+  minimapCtx.lineWidth   = 1.5;
+  minimapCtx.fillRect(rx, ry, rw, rh);
+  minimapCtx.strokeRect(rx, ry, rw, rh);
+}
+
+app.ticker.add(drawMinimap);
+
+// Navigation via clic / drag sur la minimap
+let minimapDragging = false;
+
+function navigateFromMinimap(e) {
+  const rect = minimapCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  const mapX = (mx / MINIMAP_W) * (MAP_WIDTH_TILES  * TILE_SIZE);
+  const mapY = (my / MINIMAP_H) * (MAP_HEIGHT_TILES * TILE_SIZE);
+
+  targetX = app.screen.width  / 2 - mapX * world.scale.x;
+  targetY = app.screen.height / 2 - mapY * world.scale.y;
+  clampTarget();
+}
+
+minimapCanvas.addEventListener('pointerdown', (e) => {
+  minimapDragging = true;
+  navigateFromMinimap(e);
+  e.stopPropagation();
+});
+minimapCanvas.addEventListener('pointermove', (e) => {
+  if (!minimapDragging) return;
+  navigateFromMinimap(e);
+  e.stopPropagation();
+});
+['pointerup', 'pointerleave'].forEach(evt =>
+  minimapCanvas.addEventListener(evt, () => minimapDragging = false)
+);
 
 // --- Chargement des zones d'interaction (PIXI v8) ---
 fetch('assets/interactionZone.json')
