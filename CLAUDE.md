@@ -15,25 +15,26 @@ npx serve .
 
 Then open `http://localhost:8080` in a browser. No build step required — Pixi.js is loaded from CDN.
 
-## Tile Generation
+## Tile & Minimap Generation
 
-Tiles are pre-generated from a source image (`tile-generator/map.png`) and must be regenerated when the base map changes:
+Source image: `tile-generator/map.jpg`
 
 ```bash
 cd tile-generator
-npm install       # only needed once; installs Sharp
-node tile-generator.js
+npm install              # only needed once; installs Sharp
+node tile-generator.js   # génère assets/tiles/{row}_{col}.webp
+node minimap-generator.js  # génère assets/map-mini.webp (320px)
 ```
 
-Output: `../assets/tiles/{row}_{col}.png` — 48 tiles total (8 columns × 6 rows, each 1024×1024px).
+After regenerating tiles, update `MAP_WIDTH_TILES` and `MAP_HEIGHT_TILES` in `main.js` to match the new grid (printed in the console by the script).
 
-Alternatively, `tile-generator/script-tuile.jsx` is an Adobe Photoshop ExtendScript for manual tile export.
+Current grid: **14 columns × 10 rows**, 512×512px tiles (source: 7168×5120px).
 
 ## Architecture
 
 **Stack:** Vanilla JavaScript + Pixi.js v7.2.4 (CDN) — no framework, no bundler, no TypeScript.
 
-**Map dimensions:** 8192×6144px total (8 cols × 6 rows of 1024×1024px tiles). Coordinates in `interactionZone.json` are in map pixels.
+**Map dimensions:** 7168×5120px total (14 cols × 10 rows of 512×512px tiles). Coordinates in `interactionZone.json` are in map pixels.
 
 **Pixi.js container hierarchy:**
 ```
@@ -42,13 +43,15 @@ app.stage
         └── tileContainer       ← tile sprites + zone graphics
 ```
 
-`world.x/y` and `world.scale` drive all panning and zooming. The `targetX/targetY` state is lerp'd into `world.x/y` each tick for smooth movement.
+`world.x/y` and `world.scale` drive all panning and zooming. The `targetX/targetY` state is lerp'd into `world.x/y` each tick for smooth pan. Zoom snaps `world.x/y` immediately (no lerp) to avoid jitter.
 
-**Tile system (`main.js:64-91`):** Tiles are lazy-loaded each frame by computing which rows/cols are in the current viewport. Loaded tiles are cached in the `tileSprites` object and never unloaded.
+**Zoom:** minimum scale is dynamic (`getMinScale()`) so the map always covers the full screen. Zoom is anchored to the cursor position using `targetX/targetY` (not the lerped `world.x/y`).
 
-**Zoom anchor system (`main.js:32-35`, `126-168`):** An `anchor` point in map-space is maintained so that zoom operations (wheel or buttons) keep that point visually fixed on screen. The anchor updates on `pointerdown`.
+**Tile system (`main.js`):** Tiles are lazy-loaded each frame based on the current viewport. Loaded tiles are cached in `tileSprites` and never unloaded. Tile format: WebP.
 
-**Interactive zones (`main.js:209-306`):** Loaded from `assets/interactionZone.json`. Each zone renders a semi-transparent colored rectangle and optionally an `PIXI.AnimatedSprite`. Zone images must be named `assets/{image}/{image}_{n}.png` (e.g. `assets/zone_sprite/zone_sprite_0.png`).
+**Minimap (`main.js`):** HTML5 Canvas element (`#minimap`) drawing `assets/map-mini.webp` with a live viewport rectangle. Click or drag on the minimap to navigate.
+
+**Interactive zones:** Loaded from `assets/interactionZone.json`. Each zone renders a semi-transparent colored rectangle and optionally a `PIXI.AnimatedSprite`.
 
 ## Interactive Zone JSON Schema
 
