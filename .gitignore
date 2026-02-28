@@ -5,3 +5,5 @@ dist/
 **/.DS_Store
 tile-generator/map.png
 assets/tiles__photoshop/
+
+.vscode/
