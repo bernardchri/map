@@ -10,6 +10,7 @@ Visionneuse de carte interactive construite avec Pixi.js.
 - Pan fluide avec inertie
 - Chargement lazy des tuiles selon le viewport
 - Zones d'interaction animées configurables via JSON
+- POI cliquables avec panel de contenu Markdown
 - Minimap interactive (clic/drag pour naviguer)
 - Responsive — la carte couvre toujours l'écran entier
 
@@ -52,3 +53,20 @@ node frames-to-webp.js ../assets/nom_animation
 ```
 
 3. Ajoute une entrée dans `assets/interactionZone.json` avec `"image": "nom_animation"`
+
+## Ajouter un POI
+
+1. Crée un fichier `assets/poi/mon-projet.md` avec le contenu (Markdown standard)
+2. Ajoute une entrée dans `assets/poi.json` :
+
+```json
+{
+  "id": "mon-projet",
+  "x": 3500,
+  "y": 2400,
+  "label": "Mon projet",
+  "content": "assets/poi/mon-projet.md"
+}
+```
+
+La taille des POI se règle via `POI_RADIUS` dans `main.js`.
