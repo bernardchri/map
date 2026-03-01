@@ -110,9 +110,47 @@
     @media (max-width: 768px) {
       #poi-panel { width: 90vw; }
     }
+
+    /* --- Splash screen --- */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+    #splash.parting {
+      background: transparent;
+    }
+    #splash-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      letter-spacing: 0.25em;
+      text-transform: lowercase;
+      color: #111;
+      opacity: 1;
+      transition: opacity 0.6s ease;
+      z-index: 1;
+    }
+    #splash-text.fade { opacity: 0; }
+
+    .cloud {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      will-change: transform, opacity;
+    }
   </style>
 </head>
 <body>
+  <div id="splash">
+    <span id="splash-text">studio bergall</span>
+  </div>
+
   <div id="canvas-container"></div>
 
   <div id="map-ui">
@@ -131,6 +169,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <script src="splash.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

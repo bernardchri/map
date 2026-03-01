@@ -60,6 +60,8 @@ app.stage
 
 **POI:** définis dans `assets/poi.json`. Chaque POI affiche un cercle noir/blanc avec un anneau pulse animé. Au clic, un panel slide-in charge et rend le fichier `.md` associé via marked.js. `POI_RADIUS` en haut de `main.js` contrôle la taille.
 
+**Splash screen (`splash.js`):** Overlay DOM (pas Pixi) avec texte "studio bergall" + nuages blancs générés dynamiquement (ellipses CSS avec `border-radius: 50%` + `box-shadow`). Après 2s le texte fade, à 2.5s les nuages dérivent vers l'extérieur (direction calculée depuis le centre, tailles/positions/timings aléatoires). Un léger dézoom CSS (`scale(1.12)` → `scale(1)`) sur `#canvas-container` accompagne l'ouverture. L'overlay est supprimé du DOM à 5.5s. Configurable via `CLOUD_COUNT` et les timings dans `splash.js`.
+
 ## POI JSON Schema
 
 ```json
