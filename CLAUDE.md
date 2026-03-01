@@ -40,7 +40,8 @@ Current grid: **14 columns × 10 rows**, 512×512px tiles (source: 7168×5120px)
 ```
 app.stage
   └── world (Container)         ← panned/zoomed as a unit
-        └── tileContainer       ← tile sprites + zone graphics
+        ├── tileContainer       ← tile sprites + zone graphics
+        └── poiContainer        ← POI (toujours au-dessus des tuiles)
 ```
 
 `world.x/y` and `world.scale` drive all panning and zooming. The `targetX/targetY` state is lerp'd into `world.x/y` each tick for smooth pan. Zoom snaps `world.x/y` immediately (no lerp) to avoid jitter.
@@ -54,6 +55,24 @@ app.stage
 **Interactive zones:** Loaded from `assets/interactionZone.json`. Each zone renders a semi-transparent colored rectangle and optionally a `PIXI.AnimatedSprite`. Frame images are WebP, named `assets/{image}/{image}_{n}.webp`.
 
 **Adding an animation:** export PNG frames into `assets/{name}/`, run `node tile-generator/frames-to-webp.js ../assets/{name}` to batch-convert to WebP (deletes PNGs), then add a zone entry in `interactionZone.json`.
+
+**Zoom:** `applyZoom(newScale, anchorX, anchorY)` unifie zoom molette et boutons. Le zoom est instantané (pas de lerp) pour éviter le jitter — seul le pan est lissé.
+
+**POI:** définis dans `assets/poi.json`. Chaque POI affiche un cercle noir/blanc avec un anneau pulse animé. Au clic, un panel slide-in charge et rend le fichier `.md` associé via marked.js. `POI_RADIUS` en haut de `main.js` contrôle la taille.
+
+## POI JSON Schema
+
+```json
+{
+  "id": "mon-projet",
+  "x": 3500,             // map pixel X
+  "y": 2400,             // map pixel Y
+  "label": "Mon projet",
+  "content": "assets/poi/mon-projet.md"
+}
+```
+
+Le fichier `.md` peut contenir du Markdown standard (titres, listes, images, liens). Les images référencées doivent être dans `assets/poi/`.
 
 ## Interactive Zone JSON Schema
 
