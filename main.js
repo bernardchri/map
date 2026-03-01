@@ -5,6 +5,7 @@ const TILE_SIZE        = 512;
 const MAP_WIDTH_TILES  = 14;
 const MAP_HEIGHT_TILES = 10;
 const MAX_SCALE        = 2;
+const INITIAL_ZOOM     = 1.6;   // multiplicateur du zoom initial (1 = fit-to-screen)
 const POI_RADIUS       = 24;
 const MINIMAP_W        = 160;
 const MINIMAP_H        = Math.round(MINIMAP_W / (MAP_WIDTH_TILES / MAP_HEIGHT_TILES));
@@ -161,8 +162,8 @@ document.getElementById('zoom-out').addEventListener('click', () =>
 // ============================================================
 //  INITIAL VIEW + RESIZE
 // ============================================================
-function centerAndFitToScreen() {
-  const scale = getMinScale();
+function centerAndFitToScreen(zoom = 1) {
+  const scale = getMinScale() * zoom;
   world.scale.set(scale);
   const mapW = MAP_WIDTH_TILES  * TILE_SIZE * scale;
   const mapH = MAP_HEIGHT_TILES * TILE_SIZE * scale;
@@ -170,11 +171,11 @@ function centerAndFitToScreen() {
   world.y = targetY = (app.renderer.height - mapH) / 2;
 }
 
-centerAndFitToScreen();
+centerAndFitToScreen(INITIAL_ZOOM);
 
 window.addEventListener('resize', () => {
   app.renderer.resize(window.innerWidth, window.innerHeight);
-  centerAndFitToScreen();
+  centerAndFitToScreen(INITIAL_ZOOM);
 });
 
 // ============================================================

@@ -12,7 +12,7 @@ Visionneuse de carte interactive construite avec Pixi.js.
 - Zones d'interaction animées configurables via JSON
 - POI cliquables avec panel de contenu Markdown
 - Minimap interactive (clic/drag pour naviguer)
-- Splash screen animé (nuages qui s'écartent pour révéler la carte)
+- Splash screen animé (nuages qui s'écartent + zoom d'ouverture)
 - Responsive — la carte couvre toujours l'écran entier
 
 ## Lancer en local

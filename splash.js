@@ -5,8 +5,12 @@
   const splash = document.getElementById('splash');
   if (!splash) return;
 
-  const rand = (min, max) => Math.random() * (max - min) + min;
+  // CONFIG
   const CLOUD_COUNT = 50;
+  const INITIAL_ZOOM = 4;        // zoom initial sur la carte (1 = pas de zoom)
+  const ZOOM_DURATION = 3.3;        // durée du dézoom en secondes
+
+  const rand = (min, max) => Math.random() * (max - min) + min;
 
   // Generate clouds with random sizes, positions, and drift directions
   for (let i = 0; i < CLOUD_COUNT; i++) {
@@ -65,7 +69,7 @@
   const canvas = document.getElementById('canvas-container');
   if (canvas) {
     canvas.style.transition = 'none';
-    canvas.style.transform = 'scale(1.12)';
+    canvas.style.transform = `scale(${INITIAL_ZOOM})`;
   }
 
   // 2.0s — fade out text
@@ -77,7 +81,7 @@
   // 2.2s — start zoom out to normal (just before clouds part)
   setTimeout(() => {
     if (canvas) {
-      canvas.style.transition = 'transform 3.3s cubic-bezier(0.25, 0.1, 0.25, 1)';
+      canvas.style.transition = `transform ${ZOOM_DURATION}s cubic-bezier(0.25, 0.1, 0.25, 1)`;
       canvas.style.transform = 'scale(1)';
     }
   }, 2200);
