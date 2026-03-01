@@ -1,17 +1,17 @@
-const TILE_SIZE = 512;
-const MAP_WIDTH_TILES = 14;
+// ============================================================
+//  CONFIG
+// ============================================================
+const TILE_SIZE        = 512;
+const MAP_WIDTH_TILES  = 14;
 const MAP_HEIGHT_TILES = 10;
+const MAX_SCALE        = 2;
+const POI_RADIUS       = 24;
+const MINIMAP_W        = 160;
+const MINIMAP_H        = Math.round(MINIMAP_W / (MAP_WIDTH_TILES / MAP_HEIGHT_TILES));
 
-const MAX_SCALE = 2;
-
-// Zoom minimum dynamique : la carte couvre toujours tout l'écran
-function getMinScale() {
-  return Math.max(
-    app.screen.width  / (MAP_WIDTH_TILES  * TILE_SIZE),
-    app.screen.height / (MAP_HEIGHT_TILES * TILE_SIZE)
-  );
-}
-
+// ============================================================
+//  PIXI SETUP
+// ============================================================
 const app = new PIXI.Application({
   width: window.innerWidth,
   height: window.innerHeight,
@@ -27,34 +27,29 @@ app.stage.addChild(world);
 const tileContainer = new PIXI.Container();
 world.addChild(tileContainer);
 
-const tileSprites = {};
+const poiContainer = new PIXI.Container();
+world.addChild(poiContainer);
 
-// --- Navigation state ---
-let dragging = false;
-let lastPos = null;
-let targetX = 0;
-let targetY = 0;
+// ============================================================
+//  UTILS
+// ============================================================
+const lerp  = (a, b, t) => a + (b - a) * t;
+const clamp = (val, min, max) => Math.max(min, Math.min(val, max));
 
-
-// --- Utils ---
-function lerp(a, b, t) {
-  return a + (b - a) * t;
-}
-
-function clamp(val, min, max) {
-  return Math.max(min, Math.min(val, max));
+function getMinScale() {
+  return Math.max(
+    app.screen.width  / (MAP_WIDTH_TILES  * TILE_SIZE),
+    app.screen.height / (MAP_HEIGHT_TILES * TILE_SIZE)
+  );
 }
 
 function getBounds() {
-  const mapW = MAP_WIDTH_TILES * TILE_SIZE * world.scale.x;
+  const mapW = MAP_WIDTH_TILES  * TILE_SIZE * world.scale.x;
   const mapH = MAP_HEIGHT_TILES * TILE_SIZE * world.scale.y;
-
-  // Si la carte est plus petite que l'écran, on la centre
   const minX = mapW <= app.screen.width  ? (app.screen.width  - mapW) / 2 : -(mapW - app.screen.width);
   const maxX = mapW <= app.screen.width  ? (app.screen.width  - mapW) / 2 : 0;
   const minY = mapH <= app.screen.height ? (app.screen.height - mapH) / 2 : -(mapH - app.screen.height);
   const maxY = mapH <= app.screen.height ? (app.screen.height - mapH) / 2 : 0;
-
   return { minX, maxX, minY, maxY };
 }
 
@@ -64,28 +59,37 @@ function clampTarget() {
   targetY = clamp(targetY, minY, maxY);
 }
 
-// --- Tiles loading ---
+// ============================================================
+//  NAVIGATION STATE
+// ============================================================
+let dragging   = false;
+let lastPos    = null;
+let targetX    = 0;
+let targetY    = 0;
+let poiClicked = false;
+
+// ============================================================
+//  TILES
+// ============================================================
+const tileSprites = {};
+
 function loadVisibleTiles() {
-  const viewBounds = {
-    left: -world.x / world.scale.x,
-    top: -world.y / world.scale.y,
-    right: (-world.x + app.screen.width) / world.scale.x,
-    bottom: (-world.y + app.screen.height) / world.scale.y,
-  };
+  const left   = -world.x / world.scale.x;
+  const top    = -world.y / world.scale.y;
+  const right  = (-world.x + app.screen.width)  / world.scale.x;
+  const bottom = (-world.y + app.screen.height) / world.scale.y;
 
-  const startCol = Math.floor(viewBounds.left / TILE_SIZE);
-  const endCol = Math.ceil(viewBounds.right / TILE_SIZE);
-  const startRow = Math.floor(viewBounds.top / TILE_SIZE);
-  const endRow = Math.ceil(viewBounds.bottom / TILE_SIZE);
+  const c0 = Math.floor(left   / TILE_SIZE);
+  const c1 = Math.ceil (right  / TILE_SIZE);
+  const r0 = Math.floor(top    / TILE_SIZE);
+  const r1 = Math.ceil (bottom / TILE_SIZE);
 
-  for (let row = startRow; row < endRow; row++) {
-    for (let col = startCol; col < endCol; col++) {
+  for (let row = r0; row < r1; row++) {
+    for (let col = c0; col < c1; col++) {
+      if (row < 0 || col < 0 || row >= MAP_HEIGHT_TILES || col >= MAP_WIDTH_TILES) continue;
       const key = `${row}_${col}`;
       if (tileSprites[key]) continue;
-      if (row < 0 || col < 0 || row >= MAP_HEIGHT_TILES || col >= MAP_WIDTH_TILES) continue;
-
-      const tilePath = `assets/tiles/${row}_${col}.webp`;
-      const sprite = PIXI.Sprite.from(tilePath);
+      const sprite = PIXI.Sprite.from(`assets/tiles/${row}_${col}.webp`);
       sprite.x = col * TILE_SIZE;
       sprite.y = row * TILE_SIZE;
       tileContainer.addChild(sprite);
@@ -95,19 +99,21 @@ function loadVisibleTiles() {
 }
 app.ticker.add(loadVisibleTiles);
 
-// --- Drag & définition du point d'ancrage ---
+// ============================================================
+//  PAN
+// ============================================================
 app.view.addEventListener('pointerdown', (e) => {
+  if (poiClicked) { poiClicked = false; return; }
+  closePoiPanel();
   dragging = true;
-  lastPos = { x: e.clientX, y: e.clientY };
+  lastPos  = { x: e.clientX, y: e.clientY };
 });
 
 app.view.addEventListener('pointermove', (e) => {
   if (!dragging) return;
-  const dx = e.clientX - lastPos.x;
-  const dy = e.clientY - lastPos.y;
-  targetX += dx;
-  targetY += dy;
-  lastPos = { x: e.clientX, y: e.clientY };
+  targetX += e.clientX - lastPos.x;
+  targetY += e.clientY - lastPos.y;
+  lastPos  = { x: e.clientX, y: e.clientY };
   clampTarget();
 });
 
@@ -115,78 +121,53 @@ app.view.addEventListener('pointermove', (e) => {
   app.view.addEventListener(evt, () => dragging = false)
 );
 
-// --- Animation du déplacement ---
 app.ticker.add(() => {
   world.x = lerp(world.x, targetX, 0.1);
   world.y = lerp(world.y, targetY, 0.1);
 });
 
-// --- Zoom molette centré sur la souris ---
-app.view.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  const rect = app.view.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
-
-  // Position de la souris dans l'espace carte, calculée depuis targetX/targetY
-  const mapX = (mouseX - targetX) / world.scale.x;
-  const mapY = (mouseY - targetY) / world.scale.y;
-
-  const zoomFactor = 1 - e.deltaY * 0.0015;
-  const newScale = clamp(world.scale.x * zoomFactor, getMinScale(), MAX_SCALE);
-
-  world.scale.set(newScale);
-
-  // Recalcule targetX/targetY pour que le point sous la souris reste fixe
-  targetX = mouseX - mapX * newScale;
-  targetY = mouseY - mapY * newScale;
+// ============================================================
+//  ZOOM
+// ============================================================
+function applyZoom(newScale, anchorX, anchorY) {
+  const scale = clamp(newScale, getMinScale(), MAX_SCALE);
+  const mapX  = (anchorX - targetX) / world.scale.x;
+  const mapY  = (anchorY - targetY) / world.scale.y;
+  world.scale.set(scale);
+  targetX = anchorX - mapX * scale;
+  targetY = anchorY - mapY * scale;
   clampTarget();
-
-  // Snap immédiat : le zoom ne doit pas passer par le lerp
-  world.x = targetX;
-  world.y = targetY;
-});
-
-// --- Zoom boutons centré sur le milieu de l'écran ---
-function setScaleAndClamp(newScale) {
-  const clampedScale = clamp(newScale, getMinScale(), MAX_SCALE);
-
-  const centerX = app.screen.width / 2;
-  const centerY = app.screen.height / 2;
-
-  const mapX = (centerX - targetX) / world.scale.x;
-  const mapY = (centerY - targetY) / world.scale.y;
-
-  world.scale.set(clampedScale);
-
-  targetX = centerX - mapX * clampedScale;
-  targetY = centerY - mapY * clampedScale;
-  clampTarget();
-
   world.x = targetX;
   world.y = targetY;
 }
 
-document.getElementById('zoom-in').addEventListener('click', () => {
-  setScaleAndClamp(world.scale.x * 1.1);
+app.view.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const rect = app.view.getBoundingClientRect();
+  applyZoom(
+    world.scale.x * (1 - e.deltaY * 0.0015),
+    e.clientX - rect.left,
+    e.clientY - rect.top
+  );
 });
 
-document.getElementById('zoom-out').addEventListener('click', () => {
-  setScaleAndClamp(world.scale.x * 0.9);
-});
+document.getElementById('zoom-in').addEventListener('click', () =>
+  applyZoom(world.scale.x * 1.1, app.screen.width / 2, app.screen.height / 2)
+);
+document.getElementById('zoom-out').addEventListener('click', () =>
+  applyZoom(world.scale.x * 0.9, app.screen.width / 2, app.screen.height / 2)
+);
 
-// --- Centrage et zoom initial ---
+// ============================================================
+//  INITIAL VIEW + RESIZE
+// ============================================================
 function centerAndFitToScreen() {
   const scale = getMinScale();
   world.scale.set(scale);
-
   const mapW = MAP_WIDTH_TILES  * TILE_SIZE * scale;
   const mapH = MAP_HEIGHT_TILES * TILE_SIZE * scale;
-
-  world.x = (app.renderer.width  - mapW) / 2;
-  world.y = (app.renderer.height - mapH) / 2;
-  targetX = world.x;
-  targetY = world.y;
+  world.x = targetX = (app.renderer.width  - mapW) / 2;
+  world.y = targetY = (app.renderer.height - mapH) / 2;
 }
 
 centerAndFitToScreen();
@@ -196,13 +177,11 @@ window.addEventListener('resize', () => {
   centerAndFitToScreen();
 });
 
-
-// --- Minimap ---
+// ============================================================
+//  MINIMAP
+// ============================================================
 const minimapCanvas = document.getElementById('minimap');
-const minimapCtx = minimapCanvas.getContext('2d');
-
-const MINIMAP_W = 160;
-const MINIMAP_H = Math.round(MINIMAP_W / (MAP_WIDTH_TILES / MAP_HEIGHT_TILES));
+const minimapCtx    = minimapCanvas.getContext('2d');
 minimapCanvas.width  = MINIMAP_W;
 minimapCanvas.height = MINIMAP_H;
 
@@ -221,154 +200,171 @@ function drawMinimap() {
 
   const mapTotalW = MAP_WIDTH_TILES  * TILE_SIZE;
   const mapTotalH = MAP_HEIGHT_TILES * TILE_SIZE;
-  const scaleX = MINIMAP_W / mapTotalW;
-  const scaleY = MINIMAP_H / mapTotalH;
+  const sx = MINIMAP_W / mapTotalW;
+  const sy = MINIMAP_H / mapTotalH;
 
-  const vLeft   = clamp(-world.x / world.scale.x, 0, mapTotalW);
-  const vTop    = clamp(-world.y / world.scale.y, 0, mapTotalH);
-  const vRight  = clamp((-world.x + app.screen.width)  / world.scale.x, 0, mapTotalW);
-  const vBottom = clamp((-world.y + app.screen.height) / world.scale.y, 0, mapTotalH);
-
-  const rx = vLeft  * scaleX;
-  const ry = vTop   * scaleY;
-  const rw = (vRight  - vLeft)   * scaleX;
-  const rh = (vBottom - vTop)    * scaleY;
+  const vLeft   = clamp(-world.x / world.scale.x,                          0, mapTotalW);
+  const vTop    = clamp(-world.y / world.scale.y,                          0, mapTotalH);
+  const vRight  = clamp((-world.x + app.screen.width)  / world.scale.x,   0, mapTotalW);
+  const vBottom = clamp((-world.y + app.screen.height) / world.scale.y,   0, mapTotalH);
 
   minimapCtx.fillStyle   = 'rgba(255,255,255,0.15)';
   minimapCtx.strokeStyle = 'rgba(255,255,255,0.9)';
   minimapCtx.lineWidth   = 1.5;
-  minimapCtx.fillRect(rx, ry, rw, rh);
-  minimapCtx.strokeRect(rx, ry, rw, rh);
+  minimapCtx.fillRect  (vLeft * sx, vTop * sy, (vRight - vLeft) * sx, (vBottom - vTop) * sy);
+  minimapCtx.strokeRect(vLeft * sx, vTop * sy, (vRight - vLeft) * sx, (vBottom - vTop) * sy);
 }
-
 app.ticker.add(drawMinimap);
 
-// Navigation via clic / drag sur la minimap
 let minimapDragging = false;
 
 function navigateFromMinimap(e) {
   const rect = minimapCanvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
-
-  const mapX = (mx / MINIMAP_W) * (MAP_WIDTH_TILES  * TILE_SIZE);
-  const mapY = (my / MINIMAP_H) * (MAP_HEIGHT_TILES * TILE_SIZE);
-
+  const mapX = ((e.clientX - rect.left) / MINIMAP_W) * (MAP_WIDTH_TILES  * TILE_SIZE);
+  const mapY = ((e.clientY - rect.top)  / MINIMAP_H) * (MAP_HEIGHT_TILES * TILE_SIZE);
   targetX = app.screen.width  / 2 - mapX * world.scale.x;
   targetY = app.screen.height / 2 - mapY * world.scale.y;
   clampTarget();
 }
 
-minimapCanvas.addEventListener('pointerdown', (e) => {
-  minimapDragging = true;
-  navigateFromMinimap(e);
-  e.stopPropagation();
-});
-minimapCanvas.addEventListener('pointermove', (e) => {
-  if (!minimapDragging) return;
-  navigateFromMinimap(e);
-  e.stopPropagation();
-});
+minimapCanvas.addEventListener('pointerdown', (e) => { minimapDragging = true; navigateFromMinimap(e); e.stopPropagation(); });
+minimapCanvas.addEventListener('pointermove', (e) => { if (minimapDragging) { navigateFromMinimap(e); e.stopPropagation(); } });
 ['pointerup', 'pointerleave'].forEach(evt =>
   minimapCanvas.addEventListener(evt, () => minimapDragging = false)
 );
 
-// --- Chargement des zones d'interaction (PIXI v8) ---
+// ============================================================
+//  ZONES D'INTERACTION
+// ============================================================
+function buildAnimatedSprite(zone) {
+  const frames = [];
+  for (let i = zone.imageRange[0]; i <= zone.imageRange[1]; i++) {
+    frames.push(PIXI.Texture.from(`assets/${zone.image}/${zone.image}_${i}.webp`));
+  }
+  const sprite = new PIXI.AnimatedSprite(frames);
+  sprite.width  = zone.width;
+  sprite.height = zone.height;
+  sprite.animationSpeed = (zone.fps > 0 ? zone.fps : 30) / 60;
+  sprite.loop    = !!zone.loop;
+  sprite.visible = true;
+  return sprite;
+}
+
+function playAnimation(sprite, zone) {
+  let repeatCount = 0;
+  if (zone.loop) {
+    sprite.loop = true;
+    sprite.play();
+  } else if (zone.repeat > 0) {
+    sprite.loop = false;
+    sprite.gotoAndPlay(0);
+    sprite.onComplete = () => {
+      if (++repeatCount < zone.repeat) sprite.gotoAndPlay(0);
+      else { sprite.stop(); sprite.onComplete = null; }
+    };
+  } else {
+    sprite.loop = false;
+    sprite.gotoAndPlay(0);
+  }
+}
+
+function createZone(zone) {
+  const color    = parseInt(zone.color.replace('#', ''), 16);
+  const graphics = new PIXI.Graphics();
+  graphics.beginFill(color, 0.3);
+  graphics.drawRect(0, 0, zone.width, zone.height);
+  graphics.endFill();
+  graphics.x = zone.x;
+  graphics.y = zone.y;
+
+  if (zone.image && Array.isArray(zone.imageRange)) {
+    const sprite = buildAnimatedSprite(zone);
+    graphics.addChild(sprite);
+    if (zone.autoplay) playAnimation(sprite, zone);
+    if (zone.playOnHover) {
+      graphics.interactive = true;
+      graphics.on('pointerover', () => playAnimation(sprite, zone));
+      graphics.on('pointerout',  () => { sprite.stop(); sprite.gotoAndStop(0); sprite.onComplete = null; });
+    }
+  }
+
+  if (zone.clickable) {
+    graphics.interactive = true;
+    graphics.buttonMode  = true;
+    graphics.on('pointerdown', () => alert(`Zone "${zone.image}" cliquée !`));
+  }
+
+  return graphics;
+}
+
 fetch('assets/interactionZone.json')
   .then(res => res.json())
   .then(async zones => {
-    // Récupère toutes les URLs d'images à charger
-    const allFrames = [];
-    zones.forEach(zone => {
-      if (zone.image && Array.isArray(zone.imageRange)) {
-        for (let i = zone.imageRange[0]; i <= zone.imageRange[1]; i++) {
-          allFrames.push(`assets/${zone.image}/${zone.image}_${i}.webp`);
-        }
-      }
-    });
-
-    // Charge toutes les images avec PIXI.Assets
+    const allFrames = zones.flatMap(zone =>
+      zone.image && Array.isArray(zone.imageRange)
+        ? Array.from({ length: zone.imageRange[1] - zone.imageRange[0] + 1 },
+            (_, i) => `assets/${zone.image}/${zone.image}_${zone.imageRange[0] + i}.webp`)
+        : []
+    );
     await PIXI.Assets.load(allFrames);
-
-    // Toutes les images sont chargées, on peut créer les zones
-    zones.forEach(zone => {
-      const color = parseInt(zone.color.replace('#', ''), 16);
-      const graphics = new PIXI.Graphics();
-      graphics.beginFill(color, 0.3);
-      graphics.drawRect(0, 0, zone.width, zone.height);
-      graphics.endFill();
-      graphics.x = zone.x;
-      graphics.y = zone.y;
-
-      // Ajout du sprite animé si demandé
-      let animatedSprite = null;
-      if (zone.image && Array.isArray(zone.imageRange)) {
-        const frames = [];
-        for (let i = zone.imageRange[0]; i <= zone.imageRange[1]; i++) {
-          frames.push(PIXI.Texture.from(`assets/${zone.image}/${zone.image}_${i}.webp`));
-        }
-        animatedSprite = new PIXI.AnimatedSprite(frames);
-        animatedSprite.width = zone.width;
-        animatedSprite.height = zone.height;
-
-        const fps = zone.fps && zone.fps > 0 ? zone.fps : 30;
-        animatedSprite.animationSpeed = fps / 60;
-        animatedSprite.loop = !!zone.loop;
-        animatedSprite.visible = true;
-        graphics.addChild(animatedSprite);
-
-        // Gestion de la lecture
-        let repeatCount = 0;
-        function playAnimation() {
-          if (zone.loop) {
-            animatedSprite.loop = true;
-            animatedSprite.play();
-          } else if (zone.repeat && zone.repeat > 0) {
-            animatedSprite.loop = false;
-            repeatCount = 0;
-            animatedSprite.gotoAndPlay(0);
-            animatedSprite.onComplete = () => {
-              repeatCount++;
-              if (repeatCount < zone.repeat) {
-                animatedSprite.gotoAndPlay(0);
-              } else {
-                animatedSprite.stop();
-                animatedSprite.onComplete = null;
-              }
-            };
-          } else {
-            animatedSprite.loop = false;
-            animatedSprite.gotoAndPlay(0);
-          }
-        }
-
-        if (zone.autoplay) {
-          playAnimation();
-        }
-
-        if (zone.playOnHover) {
-          graphics.interactive = true;
-          graphics.on('pointerover', () => playAnimation());
-          graphics.on('pointerout', () => {
-            animatedSprite.stop();
-            animatedSprite.gotoAndStop(0);
-            animatedSprite.onComplete = null;
-          });
-        }
-      }
-
-      // Interaction
-      if (zone.clickable) {
-        graphics.interactive = true;
-        graphics.buttonMode = true;
-        graphics.on('pointerdown', () => {
-          alert(`Zone "${zone.image}" cliquée !`);
-        });
-      }
-
-      tileContainer.addChild(graphics);
-    });
+    zones.forEach(zone => tileContainer.addChild(createZone(zone)));
   })
-  .catch(err => {
-    console.error('Erreur chargement des zones d\'interaction:', err);
+  .catch(err => console.error('Zones:', err));
+
+// ============================================================
+//  POI
+// ============================================================
+const poiPanel      = document.getElementById('poi-panel');
+const poiContent    = document.getElementById('poi-content');
+const poiAnimations = [];
+
+app.ticker.add(() => {
+  poiAnimations.forEach(anim => {
+    anim.phase = (anim.phase + 0.008) % 1;
+    anim.pulse.scale.set(1 + anim.phase * 1.2);
+    anim.pulse.alpha = 1 - anim.phase;
   });
+});
+
+function openPoiPanel(poi) {
+  fetch(poi.content)
+    .then(res => res.text())
+    .then(md  => { poiContent.innerHTML = marked.parse(md); poiPanel.classList.add('open'); })
+    .catch(()  => { poiContent.innerHTML = `<h1>${poi.label}</h1><p>Contenu introuvable.</p>`; poiPanel.classList.add('open'); });
+}
+
+function closePoiPanel() {
+  poiPanel.classList.remove('open');
+}
+
+document.getElementById('poi-close').addEventListener('click', closePoiPanel);
+
+function createPoiSprite(poi) {
+  const container   = new PIXI.Container();
+  container.x       = poi.x;
+  container.y       = poi.y;
+  container.interactive = true;
+  container.cursor  = 'pointer';
+  container.hitArea = new PIXI.Circle(0, 0, POI_RADIUS * 2.5);
+
+  const pulse = new PIXI.Graphics();
+  pulse.lineStyle(4, 0xffffff, 1);
+  pulse.drawCircle(0, 0, POI_RADIUS);
+  container.addChild(pulse);
+  poiAnimations.push({ pulse, phase: Math.random() });
+
+  const dot = new PIXI.Graphics();
+  dot.lineStyle(8, 0xffffff, 1);
+  dot.beginFill(0x000000);
+  dot.drawCircle(0, 0, POI_RADIUS);
+  dot.endFill();
+  container.addChild(dot);
+
+  container.on('pointerdown', () => { poiClicked = true; openPoiPanel(poi); });
+  return container;
+}
+
+fetch('assets/poi.json')
+  .then(res => res.json())
+  .then(pois => pois.forEach(poi => poiContainer.addChild(createPoiSprite(poi))))
+  .catch(err  => console.error('POI:', err));

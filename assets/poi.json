@@ -1,0 +1,9 @@
+[
+  {
+    "id": "exemple",
+    "x": 3500,
+    "y": 2400,
+    "label": "Exemple de projet",
+    "content": "assets/poi/exemple.md"
+  }
+]
