@@ -12,7 +12,8 @@
     "playOnHover": false,
     "loop": true,
     "repeat": 0,
-    "fps": 30
+    "fps": 30,
+    "visible": false
   },
   {
     "x": 1000,
@@ -27,6 +28,7 @@
     "playOnHover": false,
     "loop": false,
     "repeat": 0,
-    "fps": 30
+    "fps": 30,
+    "visible": false
   }
 ]

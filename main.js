@@ -307,7 +307,7 @@ fetch('assets/interactionZone.json')
         : []
     );
     await PIXI.Assets.load(allFrames);
-    zones.forEach(zone => tileContainer.addChild(createZone(zone)));
+    zones.filter(zone => zone.visible !== false).forEach(zone => tileContainer.addChild(createZone(zone)));
   })
   .catch(err => console.error('Zones:', err));
 

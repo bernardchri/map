@@ -1,6 +1,6 @@
-# Map Pixie — Carte interactive sur mesure
+# Dans le monde du Studio Bergall
 
-## Studio Bergall
+## le Studio
 
 **Christophe Bernard** — Designer & développeur créatif freelance.
 Basé en Bretagne, j'interviens sur toute la chaîne de création : direction artistique, illustration, motion design, 3D et développement front-end.
