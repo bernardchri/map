@@ -3,148 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Carte interactive Pixi.js</title>
+  <title>Dans le monde du Studio Bergall</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    html, body {
-      margin: 0; padding: 0; overflow: hidden; height: 100%;
-      background: #1e1e1e;
-    }
-    #canvas-container {
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-      overflow: hidden;
-    }
-    #map-ui {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: flex-end;
-      pointer-events: none; /* éviter d'interférer avec la carte */
-    }
-    #minimap {
-      display: block;
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 3px;
-      pointer-events: auto;
-      cursor: crosshair;
-    }
-    #zoom-controls {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 10;
-      pointer-events: auto;
-    }
-    #zoom-controls button {
-      font-size: 1.5rem;
-      padding: 5px 10px;
-      cursor: pointer;
-      background: #333;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      user-select: none;
-    }
-    #zoom-controls button:hover {
-      background: #555;
-    }
-
-    /* --- Panel POI --- */
-    #poi-panel {
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 380px;
-      height: 100%;
-      background: #fff;
-      color: #111;
-      font-family: 'Inter', sans-serif;
-      z-index: 100;
-      overflow-y: auto;
-      padding: 48px 28px 32px;
-      box-sizing: border-box;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
-    }
-    #poi-panel.open {
-      transform: translateX(0);
-    }
-    #poi-close {
-      position: absolute;
-      top: 14px;
-      right: 16px;
-      background: none;
-      border: none;
-      color: #999;
-      font-size: 1.2rem;
-      cursor: pointer;
-      line-height: 1;
-      font-family: 'Inter', sans-serif;
-    }
-    #poi-close:hover { color: #111; }
-    #poi-content img {
-      width: 100%;
-      border-radius: 6px;
-      margin-bottom: 20px;
-    }
-    #poi-content h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 16px; color: #111; }
-    #poi-content h2 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin: 24px 0 8px; color: #888; }
-    #poi-content p  { font-size: 0.9rem; line-height: 1.7; color: #444; margin: 0 0 12px; }
-    #poi-content ul { padding-left: 18px; color: #444; font-size: 0.9rem; line-height: 1.8; }
-    #poi-content a  { color: #111; text-underline-offset: 3px; }
-    #poi-content a:hover { color: #555; }
-    #poi-content hr { border: none; border-top: 1px solid #eee; margin: 20px 0; }
-
-    @media (max-width: 768px) {
-      #poi-panel { width: 90vw; }
-    }
-
-    /* --- Splash screen --- */
-    #splash {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.3s ease;
-    }
-    #splash.parting {
-      background: transparent;
-    }
-    #splash-text {
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
-      font-size: clamp(1.2rem, 3vw, 2rem);
-      letter-spacing: 0.25em;
-      text-transform: lowercase;
-      color: #111;
-      opacity: 1;
-      transition: opacity 0.6s ease;
-      z-index: 1;
-    }
-    #splash-text.fade { opacity: 0; }
-
-    .cloud {
-      position: absolute;
-      border-radius: 50%;
-      background: white;
-      will-change: transform, opacity;
-    }
-  </style>
+  <link rel="stylesheet" href="./src/css/style.css">
 </head>
 <body>
   <div id="splash">
@@ -169,7 +32,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
-  <script src="splash.js"></script>
-  <script src="main.js"></script>
+  <script src="./src/js/splash.js"></script>
+  <script src="./src/js/main.js"></script>
 </body>
 </html>
