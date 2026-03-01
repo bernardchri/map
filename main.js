@@ -323,6 +323,8 @@ app.ticker.add(() => {
     anim.phase = (anim.phase + 0.008) % 1;
     anim.pulse.scale.set(1 + anim.phase * 1.2);
     anim.pulse.alpha = 1 - anim.phase;
+    const s = lerp(anim.container.scale.x, anim.targetScale, 0.15);
+    anim.container.scale.set(s);
   });
 });
 
@@ -351,7 +353,8 @@ function createPoiSprite(poi) {
   pulse.lineStyle(4, 0xffffff, 1);
   pulse.drawCircle(0, 0, POI_RADIUS);
   container.addChild(pulse);
-  poiAnimations.push({ pulse, phase: Math.random() });
+  const anim = { pulse, phase: Math.random(), container, targetScale: 1 };
+  poiAnimations.push(anim);
 
   const dot = new PIXI.Graphics();
   dot.lineStyle(8, 0xffffff, 1);
@@ -360,7 +363,9 @@ function createPoiSprite(poi) {
   dot.endFill();
   container.addChild(dot);
 
-  container.on('pointerdown', () => { poiClicked = true; openPoiPanel(poi); });
+  container.on('pointerover',  () => anim.targetScale = 1.5);
+  container.on('pointerout',   () => anim.targetScale = 1);
+  container.on('pointerdown',  () => { poiClicked = true; openPoiPanel(poi); });
   return container;
 }
 
