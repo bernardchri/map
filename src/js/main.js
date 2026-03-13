@@ -167,8 +167,8 @@ function centerAndFitToScreen(zoom = 1) {
   world.scale.set(scale);
   const mapW = MAP_WIDTH_TILES  * TILE_SIZE * scale;
   const mapH = MAP_HEIGHT_TILES * TILE_SIZE * scale;
-  world.x = targetX = (app.renderer.width  - mapW) / 2;
-  world.y = targetY = (app.renderer.height - mapH) / 2;
+  world.x = targetX = (app.screen.width  - mapW) / 2;
+  world.y = targetY = (app.screen.height - mapH) / 2;
 }
 
 centerAndFitToScreen(INITIAL_ZOOM);
