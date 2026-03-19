@@ -55,7 +55,7 @@
       position: fixed;
       top: 0;
       right: 0;
-      width: 380px;
+      width: min(33vw, 600px);
       height: 100%;
       background: #fff;
       color: #111;
@@ -96,6 +96,12 @@
     #poi-content a  { color: #111; text-underline-offset: 3px; }
     #poi-content a:hover { color: #555; }
     #poi-content hr { border: none; border-top: 1px solid #eee; margin: 20px 0; }
+    #poi-content iframe {
+      max-width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      border-radius: 6px;
+    }
 
     @media (max-width: 768px) {
       #poi-panel { width: 90vw; }

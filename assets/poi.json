@@ -1,9 +1,78 @@
 [
   {
+    "id": "about",
+    "x": 3616,
+    "y": 2651,
+    "label": "Qui suis-je ?",
+    "content": "assets/poi/qui-suis-je.md"
+  },
+  {
     "id": "presentation",
-    "x": 3500,
-    "y": 2400,
-    "label": "Presentation du projet",
+    "x": 2649, "y": 4604,
+    "label": "La carte",
     "content": "assets/poi/presentation.md"
+  },
+  {
+    "id": "motiondesigner",
+    "x": 900,
+    "y": 2500,
+    "label": "Motion Designer",
+    "content": "assets/poi/motion-design.md"
+  },
+  {
+    "id": "cv",
+    "x": 3280,
+    "y": 4500,
+    "label": "Mon parcours",
+    "content": "assets/poi/cv.md"
+  },
+  {
+    "id": "scope",
+    "x": 5038,
+    "y": 1886,
+    "label": "Scope",
+    "content": "assets/poi/scope.md"
+  },
+  {
+    "id": "boutique",
+    "x": 3853,
+    "y": 1380,
+    "label": "Ma Boutique",
+    "content": "assets/poi/boutique.md"
+  },
+  {
+    "id": "Graphisme",
+    "x": 3386,
+    "y": 3740,
+    "label": "Graphisme",
+    "content": "assets/poi/graphisme.md"
+  },
+  {
+    "id": "Developpement",
+    "x": 5426,
+    "y": 2309,
+    "label": "Développement",
+    "content": "assets/poi/developpement.md"
+  },
+  {
+    "id": "3D",
+    "label": "3d",
+    "x": 2098,
+    "y": 1423,
+    "content": "assets/poi/3D.md"
+  },
+  {
+    "id": "illustrations",
+    "label": "Illustrations",
+    "x": 4226,
+    "y": 1045,
+    "content": "assets/poi/illustration.md"
+  },
+  {
+    "id": "tools",
+    "x": 3857,
+    "y": 3485,
+    "label": "Outils",
+    "content": "assets/poi/tools.md"
   }
 ]

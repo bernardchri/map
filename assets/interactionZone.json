@@ -1,7 +1,7 @@
 [
   {
-    "x": 3430,
-    "y": 4269,
+    "x": 3200,
+    "y": 4169,
     "width": 200,
     "height": 200,
     "color": "#00ff00",
@@ -13,7 +13,7 @@
     "loop": true,
     "repeat": 0,
     "fps": 30,
-    "visible": false
+    "visible": true
   },
   {
     "x": 1000,

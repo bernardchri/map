@@ -1,13 +1,19 @@
+console.log(
+  '%c fait avec ❤️ par @bergall %c https://bergall.fr ',
+  'background:#2563eb;color:#fff;font-size:14px;padding:6px 10px;border-radius:4px 0 0 4px;font-weight:bold',
+  'background:#fff;color:#2563eb;font-size:12px;padding:7px 10px;border-radius:0 4px 4px 0'
+);
+
 // ============================================================
-//  CONFIG
+//  CONFIG (depuis config.js)
 // ============================================================
-const TILE_SIZE        = 512;
-const MAP_WIDTH_TILES  = 14;
-const MAP_HEIGHT_TILES = 10;
-const MAX_SCALE        = 2;
-const INITIAL_ZOOM     = 1.6;   // multiplicateur du zoom initial (1 = fit-to-screen)
-const POI_RADIUS       = 24;
-const MINIMAP_W        = 160;
+const TILE_SIZE        = CONFIG.TILE_SIZE;
+const MAP_WIDTH_TILES  = CONFIG.MAP_WIDTH_TILES;
+const MAP_HEIGHT_TILES = CONFIG.MAP_HEIGHT_TILES;
+const MAX_SCALE        = CONFIG.MAX_SCALE;
+const INITIAL_ZOOM     = CONFIG.INITIAL_ZOOM;
+const POI_RADIUS       = CONFIG.POI_RADIUS;
+const MINIMAP_W        = CONFIG.MINIMAP_W;
 const MINIMAP_H        = Math.round(MINIMAP_W / (MAP_WIDTH_TILES / MAP_HEIGHT_TILES));
 
 // ============================================================
@@ -326,6 +332,7 @@ app.ticker.add(() => {
     anim.pulse.alpha = 1 - anim.phase;
     const s = lerp(anim.container.scale.x, anim.targetScale, 0.15);
     anim.container.scale.set(s);
+    if (anim.labelGroup) anim.labelGroup.scale.set(1 / s);
   });
 });
 
@@ -364,7 +371,39 @@ function createPoiSprite(poi) {
   dot.endFill();
   container.addChild(dot);
 
-  container.on('pointerover',  () => anim.targetScale = 1.5);
+  // Label
+  const label = new PIXI.Text(poi.label, {
+    fontFamily: 'Inter, sans-serif',
+    fontSize: 32,
+    fill: 0x000000,
+  });
+  const labelOffset = 32;   // écart entre le cercle et le label
+  const padX = 24;
+  const padY = 8;
+
+  label.anchor.set(0, 0.5);
+  label.x = POI_RADIUS + labelOffset;
+
+  const bg = new PIXI.Graphics();
+  bg.beginFill(0xffffff);
+  bg.drawRoundedRect(
+    label.x - padX,
+    -label.height / 2 - padY,
+    label.width + padX * 2,
+    label.height + padY * 2,
+    16
+  );
+  bg.endFill();
+  const labelGroup = new PIXI.Container();
+  labelGroup.interactive = true;
+  labelGroup.cursor = 'pointer';
+  labelGroup.on('pointerdown', () => { poiClicked = true; openPoiPanel(poi); });
+  labelGroup.addChild(bg);
+  labelGroup.addChild(label);
+  container.addChild(labelGroup);
+  anim.labelGroup = labelGroup;
+
+  container.on('pointerover',  () => { anim.targetScale = 1.5; container.parent.setChildIndex(container, container.parent.children.length - 1); });
   container.on('pointerout',   () => anim.targetScale = 1);
   container.on('pointerdown',  () => { poiClicked = true; openPoiPanel(poi); });
   return container;

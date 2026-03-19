@@ -5,10 +5,14 @@
   const splash = document.getElementById('splash');
   if (!splash) return;
 
-  // CONFIG
-  const CLOUD_COUNT = 50;
-  const INITIAL_ZOOM = 4;        // zoom initial sur la carte (1 = pas de zoom)
-  const ZOOM_DURATION = 3.3;        // durée du dézoom en secondes
+  // Raccourcis config
+  const CLOUD_COUNT       = CONFIG.CLOUD_COUNT;
+  const INITIAL_ZOOM      = CONFIG.SPLASH_ZOOM;
+  const ZOOM_DURATION     = CONFIG.SPLASH_ZOOM_DURATION;
+  const TEXT_FADE_DELAY   = CONFIG.TEXT_FADE_DELAY;
+  const CLOUDS_PART_DELAY = CONFIG.CLOUDS_PART_DELAY;
+  const ZOOM_START_DELAY  = CLOUDS_PART_DELAY - 300;
+  const CLEANUP_DELAY     = CLOUDS_PART_DELAY + 3000;
 
   const rand = (min, max) => Math.random() * (max - min) + min;
 
@@ -72,34 +76,34 @@
     canvas.style.transform = `scale(${INITIAL_ZOOM})`;
   }
 
-  // 2.0s — fade out text
+  // Fade out text
   setTimeout(() => {
     const text = document.getElementById('splash-text');
     if (text) text.classList.add('fade');
-  }, 2000);
+  }, TEXT_FADE_DELAY);
 
-  // 2.2s — start zoom out to normal (just before clouds part)
+  // Start zoom out to normal (just before clouds part)
   setTimeout(() => {
     if (canvas) {
       canvas.style.transition = `transform ${ZOOM_DURATION}s cubic-bezier(0.25, 0.1, 0.25, 1)`;
       canvas.style.transform = 'scale(1)';
     }
-  }, 2200);
+  }, ZOOM_START_DELAY);
 
-  // 2.5s — clouds part
+  // Clouds part
   setTimeout(() => {
     splash.classList.add('parting');
     splash.querySelectorAll('.cloud').forEach(c => {
       c.style.animation = c.dataset.anim;
     });
-  }, 2500);
+  }, CLOUDS_PART_DELAY);
 
-  // 5.5s — remove overlay + clean up canvas transform
+  // Remove overlay + clean up canvas transform
   setTimeout(() => {
     splash.remove();
     if (canvas) {
       canvas.style.transition = '';
       canvas.style.transform = '';
     }
-  }, 5500);
+  }, CLEANUP_DELAY);
 })();
