@@ -1,16 +1,10 @@
-# Développeur Front-end et un peu plus…
+# Développeur front-end et un peu plus…
 
-## Création personnelles
+En 2018, j'ai changé de cap pour devenir **développeur front-end à temps plein** chez Havas pendant deux ans. Création de sites vitrine à forte valeur ajoutée graphique, *landing pages événementielles*, outils internes.
 
-C'est en 2018 que j'ai pleinement changé de cap pendant 2 ans à temps plein developpeur chez Havas.
-Création de sites vitrine à forte valeur ajoutées graphique
+Depuis 2020 en freelance, je continue à coder — **WordPress FSE** sur mesure, **React/Next.js**, animations **GSAP** — *toujours au service d'un projet créatif*.
+
+![Maisons Ného](https://bergall.fr/uploads/zoom-v.jpg "Maisons Ného")
+![Kozen](https://bergall.fr/uploads/kosen_maquettes.jpg "Kozen")
 
 [En savoir plus](https://bergall.fr/je-suis-designer-numerique/)
-
-
-### Quelques références : 
-
-- [Maison ného](https://maisonneho.fr)
-- [Site de Keranden](https://keranden.bzh)
-- [Kozen](https://kosen-project.com/)
-- [French connexion agency](https://frenchconnexion-agency.com/)

@@ -89,10 +89,10 @@
       border-radius: 6px;
       margin-bottom: 20px;
     }
-    #poi-content h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 16px; color: #111; }
-    #poi-content h2 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin: 24px 0 8px; color: #888; }
-    #poi-content p  { font-size: 0.9rem; line-height: 1.7; color: #444; margin: 0 0 12px; }
-    #poi-content ul { padding-left: 18px; color: #444; font-size: 0.9rem; line-height: 1.8; }
+    #poi-content h1 { font-size: 1.45rem; font-weight: 600; margin: 0 0 16px; color: #111; }
+    #poi-content h2 { font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin: 2rem 0 1rem; color: #888; }
+    #poi-content p  { font-size: 1rem; line-height: 1.7; color: #444; margin: 0 0 1rem; }
+    #poi-content ul { padding-left: 1.25rem; color: #444; font-size: 1rem; line-height: 1.8; }
     #poi-content a  { color: #111; text-underline-offset: 3px; }
     #poi-content a:hover { color: #555; }
     #poi-content hr { border: none; border-top: 1px solid #eee; margin: 20px 0; }
@@ -101,6 +101,7 @@
       height: auto;
       aspect-ratio: 16 / 9;
       border-radius: 6px;
+      margin: 1rem 0;
     }
 
     @media (max-width: 768px) {

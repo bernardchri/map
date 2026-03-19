@@ -1,9 +1,11 @@
 # Scope
 
-## Création d'outils sur-mesure
+## Création d'outils sur mesure
 
-Afin de border un maximum j'ai crée un outil qui correspond à la façon de travailler, et je pense à beaucoup de Freelance, micro agence : **Scope** . Scope, c'est le Notion de la création de projet numérique. Préparation de sites web, application mobile, découpez votre projet en composants, péparez vos specificités techniques et gagnez un temps incroyables sur vos productions numérique.
+Pour cadrer mes projets, j'ai créé **Scope** — un outil de cahier des charges pensé pour les freelances et les micro-agences.
 
-![image du logiciel scope](https://github.com/bernardchri/Scope/raw/main/public/scope-capture.webp "scope")
+*Le Notion de la préparation de projet numérique.* Sites web, applications mobiles : découpez votre projet en **composants**, préparez vos spécificités techniques et gagnez un temps considérable sur vos productions.
 
-[En savoir plus sur le projet](https://github.com/bernardchri/Scope)
+![Capture d'écran de Scope](https://github.com/bernardchri/Scope/raw/main/public/scope-capture.webp "Scope")
+
+[Voir le projet sur GitHub](https://github.com/bernardchri/Scope)

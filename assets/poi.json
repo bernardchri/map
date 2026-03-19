@@ -3,12 +3,13 @@
     "id": "about",
     "x": 3616,
     "y": 2651,
-    "label": "Qui suis-je ?",
-    "content": "assets/poi/qui-suis-je.md"
+    "label": "A propos",
+    "content": "assets/poi/a-propos.md"
   },
   {
     "id": "presentation",
-    "x": 2649, "y": 4604,
+    "x": 2649,
+    "y": 4604,
     "label": "La carte",
     "content": "assets/poi/presentation.md"
   },
@@ -56,14 +57,14 @@
   },
   {
     "id": "3D",
-    "label": "3d",
+    "label": "Illustration 3d",
     "x": 2098,
     "y": 1423,
     "content": "assets/poi/3D.md"
   },
   {
     "id": "illustrations",
-    "label": "Illustrations",
+    "label": "Illustration 2D",
     "x": 4226,
     "y": 1045,
     "content": "assets/poi/illustration.md"
@@ -74,5 +75,12 @@
     "y": 3485,
     "label": "Outils",
     "content": "assets/poi/tools.md"
+  },
+  {
+    "id": "webdesign",
+    "x": 4236,
+    "y": 4033,
+    "label": "UX/UI designer",
+    "content": "assets/poi/webdesigner.md"
   }
 ]
