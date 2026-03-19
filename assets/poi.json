@@ -50,8 +50,7 @@
   },
   {
     "id": "Developpement",
-    "x": 5426,
-    "y": 2309,
+"x": 5281, "y": 2502,
     "label": "Développement",
     "content": "assets/poi/developpement.md"
   },

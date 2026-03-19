@@ -109,7 +109,10 @@ app.ticker.add(loadVisibleTiles);
 // ============================================================
 //  PAN
 // ============================================================
+let devDraggingZone = false; // set by dev-tools when dragging a zone
+
 app.view.addEventListener('pointerdown', (e) => {
+  if (devDraggingZone) return;
   if (poiClicked) { poiClicked = false; return; }
   closePoiPanel();
   dragging = true;
@@ -275,32 +278,36 @@ function playAnimation(sprite, zone) {
   }
 }
 
+const devZones = []; // exposed for dev-tools
+
 function createZone(zone) {
-  const color    = parseInt(zone.color.replace('#', ''), 16);
   const graphics = new PIXI.Graphics();
-  graphics.beginFill(color, 0.3);
-  graphics.drawRect(0, 0, zone.width, zone.height);
-  graphics.endFill();
+  if (CONFIG.DEV) {
+    graphics.lineStyle(2, 0xff0000, 1);
+    graphics.drawRect(0, 0, zone.width, zone.height);
+  }
   graphics.x = zone.x;
   graphics.y = zone.y;
 
+  let sprite = null;
   if (zone.image && Array.isArray(zone.imageRange)) {
-    const sprite = buildAnimatedSprite(zone);
+    sprite = buildAnimatedSprite(zone);
     graphics.addChild(sprite);
     if (zone.autoplay) playAnimation(sprite, zone);
     if (zone.playOnHover) {
-      graphics.interactive = true;
+      graphics.eventMode = 'static';
       graphics.on('pointerover', () => playAnimation(sprite, zone));
       graphics.on('pointerout',  () => { sprite.stop(); sprite.gotoAndStop(0); sprite.onComplete = null; });
     }
   }
 
   if (zone.clickable) {
-    graphics.interactive = true;
-    graphics.buttonMode  = true;
+    graphics.eventMode = 'static';
+    graphics.cursor = 'pointer';
     graphics.on('pointerdown', () => alert(`Zone "${zone.image}" cliquée !`));
   }
 
+  devZones.push({ graphics, sprite, zone });
   return graphics;
 }
 
@@ -353,7 +360,7 @@ function createPoiSprite(poi) {
   const container   = new PIXI.Container();
   container.x       = poi.x;
   container.y       = poi.y;
-  container.interactive = true;
+  container.eventMode = 'static';
   container.cursor  = 'pointer';
   container.hitArea = new PIXI.Circle(0, 0, POI_RADIUS * 2.5);
 
@@ -395,7 +402,7 @@ function createPoiSprite(poi) {
   );
   bg.endFill();
   const labelGroup = new PIXI.Container();
-  labelGroup.interactive = true;
+  labelGroup.eventMode = 'static';
   labelGroup.cursor = 'pointer';
   labelGroup.on('pointerdown', () => { poiClicked = true; openPoiPanel(poi); });
   labelGroup.addChild(bg);

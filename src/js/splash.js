@@ -5,6 +5,11 @@
   const splash = document.getElementById('splash');
   if (!splash) return;
 
+  if (CONFIG.DEV) {
+    splash.remove();
+    return;
+  }
+
   // Raccourcis config
   const CLOUD_COUNT       = CONFIG.CLOUD_COUNT;
   const INITIAL_ZOOM      = CONFIG.SPLASH_ZOOM;

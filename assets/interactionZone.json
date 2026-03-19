@@ -1,34 +1,21 @@
 [
   {
-    "x": 3200,
-    "y": 4169,
-    "width": 200,
-    "height": 200,
-    "color": "#00ff00",
-    "image": "zone_sprite",
-    "imageRange": [0, 99],
-    "clickable": true,
+    "x": 3203,
+    "y": 4178,
+    "width": 128,
+    "height": 128,
+    "color": "#000000",
+    "image": "flag_bzh",
+    "imageRange": [
+      1,
+      4
+    ],
+    "clickable": false,
     "autoplay": true,
     "playOnHover": false,
     "loop": true,
     "repeat": 0,
-    "fps": 30,
-    "visible": false
-  },
-  {
-    "x": 1000,
-    "y": 2000,
-    "width": 150,
-    "height": 100,
-    "color": "#ff0000",
-    "image": "autre_sprite",
-    "imageRange": [0, 0],
-    "clickable": false,
-    "autoplay": false,
-    "playOnHover": false,
-    "loop": false,
-    "repeat": 0,
-    "fps": 30,
-    "visible": false
+    "fps": 8,
+    "visible": true
   }
 ]

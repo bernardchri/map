@@ -23,6 +23,6 @@ const CONFIG = {
   CLOUD_COUNT:        50,
   SPLASH_ZOOM:        4,      // zoom CSS initial (1 = pas de zoom)
   SPLASH_ZOOM_DURATION: 3.3,  // durée du dézoom (secondes)
-  TEXT_FADE_DELAY:    0,     // ms avant fade du texte
-  CLOUDS_PART_DELAY:  0,   // ms avant ouverture des nuages
+  TEXT_FADE_DELAY:    750,     // ms avant fade du texte
+  CLOUDS_PART_DELAY:  1000,   // ms avant ouverture des nuages
 };
