@@ -4,7 +4,7 @@
 const CONFIG = {
 
   // ---- Dev ----
-  DEV: true,              // true = outils dev (clic droit → copie coordonnées)
+  DEV: false,              // true = outils dev (clic droit → copie coordonnées)
 
   // ---- Carte / Tuiles ----
   TILE_SIZE:        512,
