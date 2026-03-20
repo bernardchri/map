@@ -329,19 +329,23 @@ function createZone(zone) {
   return graphics;
 }
 
-fetch('assets/interactionZone.json')
-  .then(res => res.json())
-  .then(async zones => {
-    const allFrames = zones.flatMap(zone =>
-      zone.image && Array.isArray(zone.imageRange)
-        ? Array.from({ length: zone.imageRange[1] - zone.imageRange[0] + 1 },
-            (_, i) => `assets/${zone.image}/${zone.image}_${zone.imageRange[0] + i}.webp`)
-        : []
-    );
-    await PIXI.Assets.load(allFrames);
-    zones.filter(zone => zone.visible !== false).forEach(zone => tileContainer.addChild(createZone(zone)));
-  })
-  .catch(err => console.error('Zones:', err));
+async function loadZones() {
+  // Clear existing zones
+  devZones.forEach(({ graphics }) => tileContainer.removeChild(graphics));
+  devZones.length = 0;
+
+  const res = await fetch('assets/interactionZone.json?t=' + Date.now());
+  const zones = await res.json();
+  const allFrames = zones.flatMap(zone =>
+    zone.image && Array.isArray(zone.imageRange)
+      ? Array.from({ length: zone.imageRange[1] - zone.imageRange[0] + 1 },
+          (_, i) => `assets/${zone.image}/${zone.image}_${zone.imageRange[0] + i}.webp`)
+      : []
+  );
+  await PIXI.Assets.load(allFrames);
+  zones.filter(zone => zone.visible !== false).forEach(zone => tileContainer.addChild(createZone(zone)));
+}
+loadZones().catch(err => console.error('Zones:', err));
 
 // ============================================================
 //  POI
@@ -435,7 +439,14 @@ function createPoiSprite(poi) {
   return container;
 }
 
-fetch('assets/poi.json')
-  .then(res => res.json())
-  .then(pois => pois.forEach(poi => poiContainer.addChild(createPoiSprite(poi))))
-  .catch(err  => console.error('POI:', err));
+async function loadPois() {
+  // Clear existing POIs
+  poiContainer.removeChildren();
+  poiAnimations.length = 0;
+  devPois.length = 0;
+
+  const res = await fetch('assets/poi.json?t=' + Date.now());
+  const pois = await res.json();
+  pois.forEach(poi => poiContainer.addChild(createPoiSprite(poi)));
+}
+loadPois().catch(err => console.error('POI:', err));

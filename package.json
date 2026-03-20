@@ -1,0 +1,12 @@
+{
+  "name": "studio-bergall-map",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve . -l 8080 --cors & sleep 1 && open http://localhost:8080/?dev",
+    "start": "npx serve . -l 8080 --cors",
+    "tiles": "node tile-generator/tile-generator.js",
+    "minimap": "node tile-generator/minimap-generator.js",
+    "frames": "node tile-generator/frames-to-webp.js",
+    "og": "node -e \"require('sharp')('tile-generator/map.jpg').resize(1200).jpeg({quality:85}).toFile('assets/og-image.jpg')\""
+  }
+}

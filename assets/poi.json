@@ -8,8 +8,8 @@
   },
   {
     "id": "presentation",
-    "x": 2649,
-    "y": 4604,
+    "x": 2602,
+    "y": 4615,
     "label": "La carte",
     "content": "assets/poi/presentation.md"
   },
@@ -22,29 +22,29 @@
   },
   {
     "id": "cv",
-    "x": 3280,
-    "y": 4500,
+    "x": 3226,
+    "y": 4519,
     "label": "Mon parcours",
     "content": "assets/poi/cv.md"
   },
   {
     "id": "scope",
-    "x": 5038,
-    "y": 1886,
+    "x": 5047,
+    "y": 1874,
     "label": "Scope",
     "content": "assets/poi/scope.md"
   },
   {
     "id": "boutique",
-    "x": 3853,
-    "y": 1380,
+    "x": 3671,
+    "y": 1555,
     "label": "Ma Boutique",
     "content": "assets/poi/boutique.md"
   },
   {
     "id": "Graphisme",
-    "x": 3386,
-    "y": 3740,
+    "x": 3346,
+    "y": 3916,
     "label": "Graphisme",
     "content": "assets/poi/graphisme.md"
   },
@@ -71,8 +71,8 @@
   },
   {
     "id": "tools",
-    "x": 3857,
-    "y": 3485,
+    "x": 3837,
+    "y": 3559,
     "label": "Outils",
     "content": "assets/poi/tools.md"
   },

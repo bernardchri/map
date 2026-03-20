@@ -1,5 +1,5 @@
 // ============================================================
-//  DEV TOOLS — coordonnées, drag & drop zones, panel dev
+//  DEV TOOLS — coordonnées, drag & drop zones/POI, panels, export, hot reload
 // ============================================================
 (function initDevTools() {
   if (!CONFIG.DEV) return;
@@ -53,6 +53,64 @@
     navigator.clipboard.writeText(text).then(() => showToast(`${text}  ✓ copié`));
   });
 
+  // ---- Shared UI helpers ----
+  const row = (label, input) => {
+    const r = document.createElement('div');
+    Object.assign(r.style, { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' });
+    const l = document.createElement('span');
+    l.textContent = label;
+    r.appendChild(l);
+    r.appendChild(input);
+    return r;
+  };
+
+  const makeNumber = (value, onChange) => {
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = value;
+    Object.assign(input.style, {
+      width: '70px', background: '#222', color: '#0f0',
+      border: '1px solid #333', borderRadius: '4px',
+      padding: '4px 6px', fontFamily: 'monospace', fontSize: '12px',
+    });
+    input.addEventListener('change', () => onChange(parseFloat(input.value)));
+    return input;
+  };
+
+  const makeText = (value, onChange) => {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = value;
+    Object.assign(input.style, {
+      width: '140px', background: '#222', color: '#0f0',
+      border: '1px solid #333', borderRadius: '4px',
+      padding: '4px 6px', fontFamily: 'monospace', fontSize: '12px',
+    });
+    input.addEventListener('change', () => onChange(input.value));
+    return input;
+  };
+
+  const makeCheckbox = (checked, onChange) => {
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.checked = checked;
+    input.style.accentColor = '#0f0';
+    input.addEventListener('change', () => onChange(input.checked));
+    return input;
+  };
+
+  const makeButton = (text, onClick) => {
+    const btn = document.createElement('button');
+    btn.textContent = text;
+    Object.assign(btn.style, {
+      background: '#222', color: '#0f0', border: '1px solid #0f0',
+      borderRadius: '4px', padding: '6px 12px', cursor: 'pointer',
+      fontFamily: 'monospace', fontSize: '12px', marginRight: '6px',
+    });
+    btn.addEventListener('click', onClick);
+    return btn;
+  };
+
   // ---- Dev panel (DOM) ----
   const panel = document.createElement('div');
   panel.id = 'dev-zone-panel';
@@ -67,13 +125,9 @@
   });
   document.body.appendChild(panel);
 
-  let activeEntry = null; // { graphics, sprite, zone }
+  function closePanel() { panel.style.display = 'none'; }
 
-  function closePanel() {
-    panel.style.display = 'none';
-    activeEntry = null;
-  }
-
+  // ---- Zone panel ----
   function copyZoneJson(zone) {
     const obj = {
       x: Math.round(zone.x),
@@ -86,116 +140,60 @@
       fps: zone.fps || 30,
       autoplay: !!zone.autoplay,
       loop: !!zone.loop,
+      pingpong: !!zone.pingpong,
       playOnHover: !!zone.playOnHover,
       clickable: !!zone.clickable,
       repeat: zone.repeat || 0,
+      frameOffset: zone.frameOffset || 0,
+      loopDelay: zone.loopDelay || 0,
       visible: zone.visible !== false,
     };
     const text = JSON.stringify(obj, null, 2);
     navigator.clipboard.writeText(text).then(() => showToast(`Zone "${zone.image}" ✓ copié`));
   }
 
-  function buildPanel(entry) {
+  function buildZonePanel(entry) {
     const { zone, sprite, graphics } = entry;
-    activeEntry = entry;
-
-    const row = (label, input) => {
-      const r = document.createElement('div');
-      Object.assign(r.style, { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' });
-      const l = document.createElement('span');
-      l.textContent = label;
-      r.appendChild(l);
-      r.appendChild(input);
-      return r;
-    };
-
-    const makeNumber = (value, onChange) => {
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.value = value;
-      Object.assign(input.style, {
-        width: '70px', background: '#222', color: '#0f0',
-        border: '1px solid #333', borderRadius: '4px',
-        padding: '4px 6px', fontFamily: 'monospace', fontSize: '12px',
-      });
-      input.addEventListener('change', () => onChange(parseFloat(input.value)));
-      return input;
-    };
-
-    const makeCheckbox = (checked, onChange) => {
-      const input = document.createElement('input');
-      input.type = 'checkbox';
-      input.checked = checked;
-      input.style.accentColor = '#0f0';
-      input.addEventListener('change', () => onChange(input.checked));
-      return input;
-    };
-
-    const makeButton = (text, onClick) => {
-      const btn = document.createElement('button');
-      btn.textContent = text;
-      Object.assign(btn.style, {
-        background: '#222', color: '#0f0', border: '1px solid #0f0',
-        borderRadius: '4px', padding: '6px 12px', cursor: 'pointer',
-        fontFamily: 'monospace', fontSize: '12px', marginRight: '6px',
-      });
-      btn.addEventListener('click', onClick);
-      return btn;
-    };
 
     panel.innerHTML = '';
 
     // Title
     const title = document.createElement('div');
-    title.textContent = `▸ ${zone.image || 'zone'}`;
+    title.textContent = `▸ Zone: ${zone.image || 'zone'}`;
     Object.assign(title.style, { fontWeight: 'bold', marginBottom: '12px', fontSize: '14px' });
     panel.appendChild(title);
 
-    // Position (read-only, updated by drag)
+    // Position
     const posLabel = document.createElement('div');
     posLabel.id = 'dev-pos-label';
     posLabel.textContent = `x: ${Math.round(graphics.x)}  y: ${Math.round(graphics.y)}`;
     Object.assign(posLabel.style, { marginBottom: '10px', color: '#888' });
     panel.appendChild(posLabel);
 
-    // Width
     panel.appendChild(row('width', makeNumber(zone.width, (v) => {
       zone.width = v;
       if (sprite) sprite.width = v;
       redrawBorder(graphics, zone);
     })));
 
-    // Height
     panel.appendChild(row('height', makeNumber(zone.height, (v) => {
       zone.height = v;
       if (sprite) sprite.height = v;
       redrawBorder(graphics, zone);
     })));
 
-    // FPS
     if (sprite) {
       panel.appendChild(row('fps', makeNumber(zone.fps || 30, (v) => {
         zone.fps = v;
         sprite.animationSpeed = v / 60;
       })));
+      panel.appendChild(row('loop', makeCheckbox(!!zone.loop, (v) => { zone.loop = v; sprite.loop = v; })));
+      panel.appendChild(row('pingpong', makeCheckbox(!!zone.pingpong, (v) => { zone.pingpong = v; })));
+      panel.appendChild(row('repeat', makeNumber(zone.repeat || 0, (v) => { zone.repeat = v; })));
+      panel.appendChild(row('frameOffset', makeNumber(zone.frameOffset || 0, (v) => { zone.frameOffset = v; })));
+      panel.appendChild(row('loopDelay', makeNumber(zone.loopDelay || 0, (v) => { zone.loopDelay = v; })));
     }
 
-    // Loop
-    if (sprite) {
-      panel.appendChild(row('loop', makeCheckbox(!!zone.loop, (v) => {
-        zone.loop = v;
-        sprite.loop = v;
-      })));
-    }
-
-    // Repeat
-    if (sprite) {
-      panel.appendChild(row('repeat', makeNumber(zone.repeat || 0, (v) => {
-        zone.repeat = v;
-      })));
-    }
-
-    // Visible
     panel.appendChild(row('visible', makeCheckbox(zone.visible !== false, (v) => {
       zone.visible = v;
       graphics.visible = v;
@@ -205,14 +203,53 @@
     const btnRow = document.createElement('div');
     Object.assign(btnRow.style, { marginTop: '12px', borderTop: '1px solid #333', paddingTop: '10px' });
 
-    btnRow.appendChild(makeButton('📋 Copier coords', () => copyZoneJson({ x: graphics.x, y: graphics.y })));
+    btnRow.appendChild(makeButton('Copy JSON', () => copyZoneJson(zone)));
 
     if (sprite) {
-      btnRow.appendChild(makeButton('▶ Play', () => playAnimation(sprite, zone)));
-      btnRow.appendChild(makeButton('⏹ Stop', () => { sprite.stop(); sprite.gotoAndStop(0); }));
+      btnRow.appendChild(makeButton('Play', () => playAnimation(sprite, zone)));
+      btnRow.appendChild(makeButton('Stop', () => { sprite.stop(); sprite.gotoAndStop(0); }));
     }
 
-    const closeBtn = makeButton('✕ Fermer', closePanel);
+    const closeBtn = makeButton('Fermer', closePanel);
+    closeBtn.style.marginTop = '8px';
+    closeBtn.style.display = 'block';
+    closeBtn.style.width = '100%';
+    btnRow.appendChild(closeBtn);
+
+    panel.appendChild(btnRow);
+    panel.style.display = 'block';
+  }
+
+  // ---- POI panel ----
+  function buildPoiPanel(entry) {
+    const { poi, container } = entry;
+
+    panel.innerHTML = '';
+
+    const title = document.createElement('div');
+    title.textContent = `▸ POI: ${poi.label}`;
+    Object.assign(title.style, { fontWeight: 'bold', marginBottom: '12px', fontSize: '14px' });
+    panel.appendChild(title);
+
+    const posLabel = document.createElement('div');
+    posLabel.id = 'dev-pos-label';
+    posLabel.textContent = `x: ${Math.round(container.x)}  y: ${Math.round(container.y)}`;
+    Object.assign(posLabel.style, { marginBottom: '10px', color: '#888' });
+    panel.appendChild(posLabel);
+
+    panel.appendChild(row('id', makeText(poi.id, (v) => { poi.id = v; })));
+    panel.appendChild(row('label', makeText(poi.label, (v) => { poi.label = v; })));
+    panel.appendChild(row('content', makeText(poi.content, (v) => { poi.content = v; })));
+
+    const btnRow = document.createElement('div');
+    Object.assign(btnRow.style, { marginTop: '12px', borderTop: '1px solid #333', paddingTop: '10px' });
+
+    btnRow.appendChild(makeButton('Copy JSON', () => {
+      const text = JSON.stringify(poi, null, 2);
+      navigator.clipboard.writeText(text).then(() => showToast(`POI "${poi.label}" ✓ copié`));
+    }));
+
+    const closeBtn = makeButton('Fermer', closePanel);
     closeBtn.style.marginTop = '8px';
     closeBtn.style.display = 'block';
     closeBtn.style.width = '100%';
@@ -228,7 +265,152 @@
     graphics.drawRect(0, 0, zone.width, zone.height);
   }
 
-  // ---- Wait for zones to be loaded, then attach interactions ----
+  // ---- Export complet JSON ----
+  function exportAllZones() {
+    const data = devZones.map(({ zone }) => ({ ...zone }));
+    const text = JSON.stringify(data, null, 2);
+    navigator.clipboard.writeText(text).then(() => showToast(`interactionZone.json (${data.length} zones) ✓ copié`));
+  }
+
+  function exportAllPois() {
+    const data = devPois.map(({ poi }) => ({ ...poi }));
+    const text = JSON.stringify(data, null, 2);
+    navigator.clipboard.writeText(text).then(() => showToast(`poi.json (${data.length} POIs) ✓ copié`));
+  }
+
+  // ---- Hot reload ----
+  async function hotReload() {
+    closePanel();
+    await Promise.all([loadZones(), loadPois()]);
+    showToast('Hot reload OK');
+    // Re-attach dev interactions after reload
+    setTimeout(() => { initZoneDev(); initPoiDev(); }, 300);
+  }
+
+  // ---- Toolbar (export + reload) ----
+  const toolbar = document.createElement('div');
+  Object.assign(toolbar.style, {
+    position: 'fixed', bottom: '20px', right: '20px',
+    display: 'flex', gap: '6px', zIndex: '10000',
+  });
+
+  toolbar.appendChild(makeButton('Export Zones', exportAllZones));
+  toolbar.appendChild(makeButton('Export POIs', exportAllPois));
+
+  const reloadBtn = makeButton('Reload JSON (R)', hotReload);
+  toolbar.appendChild(reloadBtn);
+
+  document.body.appendChild(toolbar);
+
+  // Raccourci clavier R pour hot reload
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'r' && !e.ctrlKey && !e.metaKey && e.target.tagName !== 'INPUT') {
+      hotReload();
+    }
+  });
+
+  // ---- Zone drag & drop ----
+  let zoneDragTarget = null;
+  let zoneDragOffset = { x: 0, y: 0 };
+  let isDraggingZone = false;
+
+  function initZoneDev() {
+    devZones.forEach((entry) => {
+      const { graphics } = entry;
+      graphics.eventMode = 'static';
+      graphics.cursor = 'grab';
+      graphics.hitArea = new PIXI.Rectangle(0, 0, entry.zone.width, entry.zone.height);
+
+      graphics.removeAllListeners('pointerdown');
+      graphics.on('pointerdown', (e) => {
+        e.stopPropagation();
+        zoneDragTarget = entry;
+        isDraggingZone = true;
+        devDraggingZone = true;
+        graphics.cursor = 'grabbing';
+        const pos = e.data.getLocalPosition(graphics.parent);
+        zoneDragOffset.x = pos.x - graphics.x;
+        zoneDragOffset.y = pos.y - graphics.y;
+        buildZonePanel(entry);
+      });
+    });
+  }
+
+  app.stage.eventMode = 'static';
+  app.stage.hitArea = app.screen;
+
+  app.view.addEventListener('pointermove', (e) => {
+    if (!isDraggingZone || !zoneDragTarget) return;
+    const mapX = (e.clientX - world.x) / world.scale.x;
+    const mapY = (e.clientY - world.y) / world.scale.y;
+    zoneDragTarget.graphics.x = Math.round(mapX - zoneDragOffset.x);
+    zoneDragTarget.graphics.y = Math.round(mapY - zoneDragOffset.y);
+    zoneDragTarget.zone.x = zoneDragTarget.graphics.x;
+    zoneDragTarget.zone.y = zoneDragTarget.graphics.y;
+    const posLabel = document.getElementById('dev-pos-label');
+    if (posLabel) posLabel.textContent = `x: ${zoneDragTarget.zone.x}  y: ${zoneDragTarget.zone.y}`;
+  });
+
+  app.view.addEventListener('pointerup', () => {
+    if (isDraggingZone && zoneDragTarget) {
+      zoneDragTarget.graphics.cursor = 'grab';
+      copyZoneJson(zoneDragTarget.zone);
+    }
+    isDraggingZone = false;
+    devDraggingZone = false;
+    zoneDragTarget = null;
+  });
+
+  // ---- POI drag & drop ----
+  let poiDragTarget = null;
+  let poiDragOffset = { x: 0, y: 0 };
+  let isDraggingPoi = false;
+
+  function initPoiDev() {
+    devPois.forEach((entry) => {
+      const { container } = entry;
+      container.cursor = 'grab';
+
+      container.removeAllListeners('pointerdown');
+      container.on('pointerdown', (e) => {
+        e.stopPropagation();
+        poiDragTarget = entry;
+        isDraggingPoi = true;
+        devDraggingZone = true;
+        container.cursor = 'grabbing';
+        const pos = e.data.getLocalPosition(container.parent);
+        poiDragOffset.x = pos.x - container.x;
+        poiDragOffset.y = pos.y - container.y;
+        buildPoiPanel(entry);
+      });
+    });
+  }
+
+  app.view.addEventListener('pointermove', (e) => {
+    if (!isDraggingPoi || !poiDragTarget) return;
+    const mapX = (e.clientX - world.x) / world.scale.x;
+    const mapY = (e.clientY - world.y) / world.scale.y;
+    poiDragTarget.container.x = Math.round(mapX - poiDragOffset.x);
+    poiDragTarget.container.y = Math.round(mapY - poiDragOffset.y);
+    poiDragTarget.poi.x = poiDragTarget.container.x;
+    poiDragTarget.poi.y = poiDragTarget.container.y;
+    const posLabel = document.getElementById('dev-pos-label');
+    if (posLabel) posLabel.textContent = `x: ${poiDragTarget.poi.x}  y: ${poiDragTarget.poi.y}`;
+  });
+
+  app.view.addEventListener('pointerup', () => {
+    if (isDraggingPoi && poiDragTarget) {
+      poiDragTarget.container.cursor = 'grab';
+      const poi = poiDragTarget.poi;
+      const text = JSON.stringify(poi, null, 2);
+      navigator.clipboard.writeText(text).then(() => showToast(`POI "${poi.label}" — x: ${poi.x}, y: ${poi.y}  ✓ copié`));
+    }
+    isDraggingPoi = false;
+    devDraggingZone = false;
+    poiDragTarget = null;
+  });
+
+  // ---- Wait & init ----
   function waitForZones() {
     if (typeof devZones === 'undefined' || devZones.length === 0) {
       setTimeout(waitForZones, 200);
@@ -237,68 +419,6 @@
     initZoneDev();
   }
 
-  function initZoneDev() {
-    let dragTarget = null;
-    let dragOffset = { x: 0, y: 0 };
-    let isDraggingZone = false;
-
-    devZones.forEach((entry) => {
-      const { graphics } = entry;
-      graphics.eventMode = 'static';
-      graphics.cursor = 'grab';
-
-      // Hit area for the full rectangle
-      graphics.hitArea = new PIXI.Rectangle(0, 0, entry.zone.width, entry.zone.height);
-
-      graphics.on('pointerdown', (e) => {
-        e.stopPropagation();
-        dragTarget = entry;
-        isDraggingZone = true;
-        devDraggingZone = true;
-        graphics.cursor = 'grabbing';
-        const pos = e.data.getLocalPosition(graphics.parent);
-        dragOffset.x = pos.x - graphics.x;
-        dragOffset.y = pos.y - graphics.y;
-
-        // Also open panel
-        buildPanel(entry);
-      });
-    });
-
-    // Global move/up on the pixi stage
-    app.stage.eventMode = 'static';
-    app.stage.hitArea = app.screen;
-
-    app.view.addEventListener('pointermove', (e) => {
-      if (!isDraggingZone || !dragTarget) return;
-
-      // Convert screen coords to map coords
-      const mapX = (e.clientX - world.x) / world.scale.x;
-      const mapY = (e.clientY - world.y) / world.scale.y;
-      dragTarget.graphics.x = Math.round(mapX - dragOffset.x);
-      dragTarget.graphics.y = Math.round(mapY - dragOffset.y);
-      dragTarget.zone.x = dragTarget.graphics.x;
-      dragTarget.zone.y = dragTarget.graphics.y;
-
-      // Update position in panel
-      const posLabel = document.getElementById('dev-pos-label');
-      if (posLabel) posLabel.textContent = `x: ${dragTarget.zone.x}  y: ${dragTarget.zone.y}`;
-    });
-
-    app.view.addEventListener('pointerup', () => {
-      if (isDraggingZone && dragTarget) {
-        dragTarget.graphics.cursor = 'grab';
-        copyZoneJson(dragTarget.zone);
-      }
-      isDraggingZone = false;
-      devDraggingZone = false;
-      dragTarget = null;
-    });
-  }
-
-  waitForZones();
-
-  // ---- POI drag & drop ----
   function waitForPois() {
     if (typeof devPois === 'undefined' || devPois.length === 0) {
       setTimeout(waitForPois, 200);
@@ -307,49 +427,6 @@
     initPoiDev();
   }
 
-  function initPoiDev() {
-    let dragTarget = null;
-    let dragOffset = { x: 0, y: 0 };
-    let isDraggingPoi = false;
-
-    devPois.forEach((entry) => {
-      const { container } = entry;
-      container.cursor = 'grab';
-
-      container.on('pointerdown', (e) => {
-        e.stopPropagation();
-        dragTarget = entry;
-        isDraggingPoi = true;
-        devDraggingZone = true;
-        container.cursor = 'grabbing';
-        const pos = e.data.getLocalPosition(container.parent);
-        dragOffset.x = pos.x - container.x;
-        dragOffset.y = pos.y - container.y;
-      });
-    });
-
-    app.view.addEventListener('pointermove', (e) => {
-      if (!isDraggingPoi || !dragTarget) return;
-      const mapX = (e.clientX - world.x) / world.scale.x;
-      const mapY = (e.clientY - world.y) / world.scale.y;
-      dragTarget.container.x = Math.round(mapX - dragOffset.x);
-      dragTarget.container.y = Math.round(mapY - dragOffset.y);
-      dragTarget.poi.x = dragTarget.container.x;
-      dragTarget.poi.y = dragTarget.container.y;
-    });
-
-    app.view.addEventListener('pointerup', () => {
-      if (isDraggingPoi && dragTarget) {
-        dragTarget.container.cursor = 'grab';
-        const poi = dragTarget.poi;
-        const text = JSON.stringify(poi, null, 2);
-        navigator.clipboard.writeText(text).then(() => showToast(`POI "${poi.label}" — x: ${poi.x}, y: ${poi.y}  ✓ copié`));
-      }
-      isDraggingPoi = false;
-      devDraggingZone = false;
-      dragTarget = null;
-    });
-  }
-
+  waitForZones();
   waitForPois();
 })();

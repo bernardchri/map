@@ -4,7 +4,7 @@
 const CONFIG = {
 
   // ---- Dev ----
-  DEV: false,              // true = outils dev (clic droit → copie coordonnées)
+  DEV: new URLSearchParams(window.location.search).has('dev'),
 
   // ---- Carte / Tuiles ----
   TILE_SIZE:        512,
