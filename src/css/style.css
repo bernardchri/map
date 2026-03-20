@@ -2,6 +2,36 @@
       margin: 0; padding: 0; overflow: hidden; height: 100%;
       background: #1e1e1e;
     }
+    /* --- Lien site bergall.fr --- */
+    #site-link {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      background: #fff;
+      padding: 4px 16px 4px 4px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #111;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      line-height: 1.2;
+      transition: transform 0.2s ease;
+      pointer-events: auto;
+    }
+    #site-link:hover {
+      transform: scale(1.05);
+    }
+    #site-link img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
     #canvas-container {
       width: 100vw;
       height: 100vh;
