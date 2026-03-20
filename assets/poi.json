@@ -50,7 +50,8 @@
   },
   {
     "id": "Developpement",
-"x": 5281, "y": 2502,
+    "x": 5281,
+    "y": 2502,
     "label": "Développement",
     "content": "assets/poi/developpement.md"
   },
@@ -77,8 +78,8 @@
   },
   {
     "id": "webdesign",
-    "x": 4236,
-    "y": 4033,
+    "x": 4189,
+    "y": 3995,
     "label": "UX/UI designer",
     "content": "assets/poi/webdesigner.md"
   }

@@ -43,7 +43,7 @@
   "height": 300,
   "color": "#000000",
   "image": "eolienne_01",
-  "offset": 3,
+  "frameOffset": 2,
   "imageRange": [
     1,
     4
@@ -88,7 +88,7 @@
     5
   ],
   "fps": 8,
-  "delay":2,
+  "frameOffset":2,
   "loopDelay":1000,
   "autoplay": true,
   "loop": true,

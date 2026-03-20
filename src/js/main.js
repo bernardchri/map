@@ -270,16 +270,19 @@ function playAnimation(sprite, zone) {
 
   const restart = () => {
     if (delay > 0) {
-      sprite.gotoAndStop(start);
-      setTimeout(() => sprite.gotoAndPlay(start), delay);
+      sprite.gotoAndStop(0);
+      setTimeout(() => sprite.gotoAndPlay(0), delay);
     } else {
-      sprite.gotoAndPlay(start);
+      sprite.gotoAndPlay(0);
     }
   };
 
   sprite.loop = false;
-  if (zone.loop) {
-    sprite.onComplete = () => restart();
+  if (zone.loop && delay === 0 && start === 0) {
+    sprite.loop = true;
+    sprite.play();
+  } else if (zone.loop) {
+    sprite.onComplete = () => { sprite.loop = true; sprite.gotoAndPlay(0); };
     sprite.gotoAndPlay(start);
   } else if (zone.repeat > 0) {
     sprite.gotoAndPlay(start);
@@ -293,6 +296,7 @@ function playAnimation(sprite, zone) {
 }
 
 const devZones = []; // exposed for dev-tools
+const devPois  = []; // exposed for dev-tools
 
 function createZone(zone) {
   const graphics = new PIXI.Graphics();
@@ -427,6 +431,7 @@ function createPoiSprite(poi) {
   container.on('pointerover',  () => { anim.targetScale = 1.5; container.parent.setChildIndex(container, container.parent.children.length - 1); });
   container.on('pointerout',   () => anim.targetScale = 1);
   container.on('pointerdown',  () => { poiClicked = true; openPoiPanel(poi); });
+  devPois.push({ container, poi });
   return container;
 }
 

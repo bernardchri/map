@@ -297,4 +297,59 @@
   }
 
   waitForZones();
+
+  // ---- POI drag & drop ----
+  function waitForPois() {
+    if (typeof devPois === 'undefined' || devPois.length === 0) {
+      setTimeout(waitForPois, 200);
+      return;
+    }
+    initPoiDev();
+  }
+
+  function initPoiDev() {
+    let dragTarget = null;
+    let dragOffset = { x: 0, y: 0 };
+    let isDraggingPoi = false;
+
+    devPois.forEach((entry) => {
+      const { container } = entry;
+      container.cursor = 'grab';
+
+      container.on('pointerdown', (e) => {
+        e.stopPropagation();
+        dragTarget = entry;
+        isDraggingPoi = true;
+        devDraggingZone = true;
+        container.cursor = 'grabbing';
+        const pos = e.data.getLocalPosition(container.parent);
+        dragOffset.x = pos.x - container.x;
+        dragOffset.y = pos.y - container.y;
+      });
+    });
+
+    app.view.addEventListener('pointermove', (e) => {
+      if (!isDraggingPoi || !dragTarget) return;
+      const mapX = (e.clientX - world.x) / world.scale.x;
+      const mapY = (e.clientY - world.y) / world.scale.y;
+      dragTarget.container.x = Math.round(mapX - dragOffset.x);
+      dragTarget.container.y = Math.round(mapY - dragOffset.y);
+      dragTarget.poi.x = dragTarget.container.x;
+      dragTarget.poi.y = dragTarget.container.y;
+    });
+
+    app.view.addEventListener('pointerup', () => {
+      if (isDraggingPoi && dragTarget) {
+        dragTarget.container.cursor = 'grab';
+        const poi = dragTarget.poi;
+        const text = JSON.stringify(poi, null, 2);
+        navigator.clipboard.writeText(text).then(() => showToast(`POI "${poi.label}" — x: ${poi.x}, y: ${poi.y}  ✓ copié`));
+      }
+      isDraggingPoi = false;
+      devDraggingZone = false;
+      dragTarget = null;
+    });
+  }
+
+  waitForPois();
 })();
