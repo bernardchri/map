@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["x", "y", "width", "height"],
+    "properties": {
+      "x": {
+        "type": "number",
+        "description": "Position X en pixels sur la carte"
+      },
+      "y": {
+        "type": "number",
+        "description": "Position Y en pixels sur la carte"
+      },
+      "width": {
+        "type": "number",
+        "description": "Largeur de la zone en pixels"
+      },
+      "height": {
+        "type": "number",
+        "description": "Hauteur de la zone en pixels"
+      },
+      "color": {
+        "type": "string",
+        "description": "Couleur de la zone (utilisée en DEV mode)",
+        "default": "#000000"
+      },
+      "image": {
+        "type": "string",
+        "description": "Nom du dossier de frames dans assets/ (ex: \"flag_bzh\" → assets/flag_bzh/)"
+      },
+      "imageRange": {
+        "type": "array",
+        "items": { "type": "integer" },
+        "minItems": 2,
+        "maxItems": 2,
+        "description": "Plage de frames [début, fin] (ex: [1, 4] → image_1.webp à image_4.webp)"
+      },
+      "fps": {
+        "type": "number",
+        "description": "Vitesse de l'animation en images par seconde",
+        "default": 30
+      },
+      "autoplay": {
+        "type": "boolean",
+        "description": "Lancer l'animation automatiquement au chargement",
+        "default": false
+      },
+      "loop": {
+        "type": "boolean",
+        "description": "Boucler l'animation indéfiniment",
+        "default": false
+      },
+      "pingpong": {
+        "type": "boolean",
+        "description": "Jouer l'animation en aller-retour (1→2→3→2→1…)",
+        "default": false
+      },
+      "frameOffset": {
+        "type": "integer",
+        "description": "Frame de départ de l'animation (index 0-based)",
+        "default": 0
+      },
+      "loopDelay": {
+        "type": "number",
+        "description": "Délai en millisecondes entre chaque boucle de l'animation",
+        "default": 0
+      },
+      "playOnHover": {
+        "type": "boolean",
+        "description": "Jouer l'animation au survol de la souris",
+        "default": false
+      },
+      "clickable": {
+        "type": "boolean",
+        "description": "Rendre la zone cliquable",
+        "default": false
+      },
+      "repeat": {
+        "type": "integer",
+        "description": "Nombre de répétitions (0 = pas de répétition, utilisé si loop est false)",
+        "default": 0
+      },
+      "visible": {
+        "type": "boolean",
+        "description": "Afficher la zone",
+        "default": true
+      }
+    },
+    "additionalProperties": false
+  }
+}

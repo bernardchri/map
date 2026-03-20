@@ -251,6 +251,9 @@ function buildAnimatedSprite(zone) {
   for (let i = zone.imageRange[0]; i <= zone.imageRange[1]; i++) {
     frames.push(PIXI.Texture.from(`assets/${zone.image}/${zone.image}_${i}.webp`));
   }
+  if (zone.pingpong) {
+    for (let i = frames.length - 2; i >= 1; i--) frames.push(frames[i]);
+  }
   const sprite = new PIXI.AnimatedSprite(frames);
   sprite.width  = zone.width;
   sprite.height = zone.height;
@@ -261,20 +264,31 @@ function buildAnimatedSprite(zone) {
 }
 
 function playAnimation(sprite, zone) {
+  const start = zone.frameOffset || 0;
+  const delay = zone.loopDelay || 0;
   let repeatCount = 0;
+
+  const restart = () => {
+    if (delay > 0) {
+      sprite.gotoAndStop(start);
+      setTimeout(() => sprite.gotoAndPlay(start), delay);
+    } else {
+      sprite.gotoAndPlay(start);
+    }
+  };
+
+  sprite.loop = false;
   if (zone.loop) {
-    sprite.loop = true;
-    sprite.play();
+    sprite.onComplete = () => restart();
+    sprite.gotoAndPlay(start);
   } else if (zone.repeat > 0) {
-    sprite.loop = false;
-    sprite.gotoAndPlay(0);
+    sprite.gotoAndPlay(start);
     sprite.onComplete = () => {
-      if (++repeatCount < zone.repeat) sprite.gotoAndPlay(0);
+      if (++repeatCount < zone.repeat) restart();
       else { sprite.stop(); sprite.onComplete = null; }
     };
   } else {
-    sprite.loop = false;
-    sprite.gotoAndPlay(0);
+    sprite.gotoAndPlay(start);
   }
 }
 
