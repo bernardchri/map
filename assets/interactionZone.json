@@ -17,84 +17,86 @@
     "repeat": 0,
     "fps": 8,
     "visible": true
-  }, 
+  },
   {
-  "x": 1762,
-  "y": 2302,
-  "width": 290,
-  "height": 300,
-  "color": "#000000",
-  "image": "eolienne_01",
-  "imageRange": [
-    1,
-    4
-  ],
-  "fps": 8,
-  "autoplay": true,
-  "loop": true,
-  "playOnHover": false,
-  "clickable": false,
-  "repeat": 0,
-  "visible": true
-}, {
-  "x": 1939,
-  "y": 2353,
-  "width": 290,
-  "height": 300,
-  "color": "#000000",
-  "image": "eolienne_01",
-  "frameOffset": 2,
-  "imageRange": [
-    1,
-    4
-  ],
-  "fps": 8,
-  "autoplay": true,
-  "loop": true,
-  "playOnHover": false,
-  "clickable": false,
-  "repeat": 0,
-  "visible": true
-},{
-  "x": 5438,
-  "y": 2208,
-  "width": 211,
-  "height": 240,
-  "color": "#000000",
-  "image": "souris",
-  "imageRange": [
-    1,
-    12
-  ],
-  "fps": 8,
-  "autoplay": true,
-  "loop": true,
-  "playOnHover": false,
-  "clickable": false,
-  "repeat": 0,
-  "loopDelay":1500,
-  "visible": true
-},
-{
-  "x": 4261,
-  "y": 1261,
-  "width": 169,
-  "height": 190,
-  "color": "#000000",
-  "image": "art",
-  "pingpong":true,
-  "imageRange": [
-    1,
-    5
-  ],
-  "fps": 8,
-  "frameOffset":2,
-  "loopDelay":1000,
-  "autoplay": true,
-  "loop": true,
-  "playOnHover": false,
-  "clickable": false,
-  "repeat": 0,
-  "visible": true
-}
+    "x": 1762,
+    "y": 2302,
+    "width": 290,
+    "height": 300,
+    "color": "#000000",
+    "image": "eolienne_01",
+    "imageRange": [
+      1,
+      4
+    ],
+    "fps": 8,
+    "autoplay": true,
+    "loop": true,
+    "playOnHover": false,
+    "clickable": false,
+    "repeat": 0,
+    "visible": true
+  },
+  {
+    "x": 1939,
+    "y": 2353,
+    "width": 290,
+    "height": 300,
+    "color": "#000000",
+    "image": "eolienne_01",
+    "frameOffset": 2,
+    "imageRange": [
+      1,
+      4
+    ],
+    "fps": 8,
+    "autoplay": true,
+    "loop": true,
+    "playOnHover": false,
+    "clickable": false,
+    "repeat": 0,
+    "visible": true
+  },
+  {
+    "x": 5438,
+    "y": 2208,
+    "width": 211,
+    "height": 240,
+    "color": "#000000",
+    "image": "souris",
+    "imageRange": [
+      1,
+      12
+    ],
+    "fps": 8,
+    "autoplay": true,
+    "loop": true,
+    "playOnHover": false,
+    "clickable": false,
+    "repeat": 0,
+    "loopDelay": 1500,
+    "visible": true
+  },
+  {
+    "x": 4261,
+    "y": 1261,
+    "width": 169,
+    "height": 190,
+    "color": "#000000",
+    "image": "art",
+    "pingpong": true,
+    "imageRange": [
+      1,
+      5
+    ],
+    "fps": 8,
+    "frameOffset": 2,
+    "loopDelay": 1000,
+    "autoplay": true,
+    "loop": true,
+    "playOnHover": false,
+    "clickable": false,
+    "repeat": 0,
+    "visible": true
+  }
 ]

@@ -34,6 +34,9 @@ app.stage.addChild(world);
 const tileContainer = new PIXI.Container();
 world.addChild(tileContainer);
 
+const zoneContainer = new PIXI.Container();
+world.addChild(zoneContainer);
+
 const poiContainer = new PIXI.Container();
 world.addChild(poiContainer);
 
@@ -331,7 +334,7 @@ function createZone(zone) {
 
 async function loadZones() {
   // Clear existing zones
-  devZones.forEach(({ graphics }) => tileContainer.removeChild(graphics));
+  devZones.forEach(({ graphics }) => zoneContainer.removeChild(graphics));
   devZones.length = 0;
 
   const res = await fetch('assets/interactionZone.json?t=' + Date.now());
@@ -343,7 +346,7 @@ async function loadZones() {
       : []
   );
   await PIXI.Assets.load(allFrames);
-  zones.filter(zone => zone.visible !== false).forEach(zone => tileContainer.addChild(createZone(zone)));
+  zones.filter(zone => zone.visible !== false).forEach(zone => zoneContainer.addChild(createZone(zone)));
 }
 loadZones().catch(err => console.error('Zones:', err));
 
