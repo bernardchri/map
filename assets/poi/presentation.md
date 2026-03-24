@@ -25,6 +25,8 @@ L’image de fond peut être **n’importe quoi** : une illustration, un plan d�
 
 Le contenu est *simple à mettre à jour*, sans compétence technique requise.
 
+[Projet github open source](https://github.com/bernardchri/map)
+
 ---
 
 ## Contact
